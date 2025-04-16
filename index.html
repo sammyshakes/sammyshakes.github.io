@@ -3,31 +3,199 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>3D Snake Game</title>
+    <title>3D Game Arcade</title>
     <link
       href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
       rel="stylesheet"
     />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
     <style>
-      /* CSS styles remain the same */
+      /* --- Global Styles --- */
       body {
         margin: 0;
-        overflow: hidden;
         background-color: #111;
         color: #fff;
         font-family: "Press Start 2P", cursive;
         display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
         flex-direction: column;
+        align-items: center;
+        padding-top: 30px; /* More space for menu */
+        min-height: 100vh;
+        box-sizing: border-box;
       }
-      #gameAndControls {
+
+      button {
+        /* Base button style */
+        font-family: "Press Start 2P", cursive;
+        cursor: pointer;
+        border-radius: 5px;
+        transition: all 0.2s ease;
+      }
+      button:active {
+        transform: translateY(1px);
+      }
+
+      /* --- Menu Styles --- */
+      #menu-screen {
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center;
+        padding: 40px;
+        text-align: center;
       }
-      #gameContainer {
+      #menu-screen h1 {
+        font-size: 2.5em;
+        color: #0f0;
+        text-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
+        margin-bottom: 40px;
+      }
+      #menu-screen button {
+        font-size: 1.2em;
+        padding: 15px 30px;
+        margin: 15px;
+        background-color: #333;
+        color: #0f0;
+        border: 2px solid #0f0;
+        box-shadow: 0 0 10px #0f0;
+      }
+      #menu-screen button:hover {
+        background-color: #0f0;
+        color: #000;
+        box-shadow: 0 0 15px #0f0, 0 0 25px #0f0;
+      }
+
+      /* --- Game Wrapper Styles --- */
+      .game-wrapper {
+        width: 95vw;
+        max-width: 1000px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      /* --- Utility --- */
+      .hidden {
+        display: none !important;
+      }
+
+      /* --- Asteroids Specific Styles --- */
+      #asteroids-game-wrapper #game-container {
+        position: relative;
+        width: 100%;
+        aspect-ratio: 1000 / 750;
+        max-height: 75vh;
+        border: 2px solid #0f0;
+        box-shadow: 0 0 15px #0f0;
+        margin-bottom: 15px;
+      }
+      #asteroids-game-wrapper canvas#asteroids-canvas {
+        /* Specific ID */
+        display: block;
+        width: 100%;
+        height: 100%;
+        cursor: grab;
+        outline: none;
+      }
+      #asteroids-game-wrapper canvas#asteroids-canvas:active {
+        cursor: grabbing;
+      }
+      #asteroids-game-wrapper #ui-container {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 16px;
+        pointer-events: none;
+        text-shadow: 0 0 5px #0f0;
+        padding: 0 10px;
+        flex-wrap: wrap;
+      }
+      #asteroids-game-wrapper #score {
+        color: #0f0;
+        margin-right: 15px;
+      }
+      #asteroids-game-wrapper #level {
+        color: #fff;
+        margin-right: 15px;
+        text-shadow: 0 0 5px #fff;
+      }
+      #asteroids-game-wrapper #lives {
+        color: #f00;
+      }
+      #asteroids-game-wrapper #message-box {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.7);
+        color: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 24px;
+        display: none;
+        border: 1px solid #0f0;
+        text-shadow: 0 0 8px #0f0;
+        pointer-events: none;
+      }
+      #asteroids-game-wrapper #controls-container {
+        margin-top: 0;
+        text-align: center;
+      }
+      #asteroids-game-wrapper #controls-info {
+        font-size: 12px;
+        color: #aaa;
+        line-height: 1.5;
+      }
+      #asteroids-game-wrapper #controls-info span {
+        color: #fff;
+        background-color: #333;
+        padding: 2px 5px;
+        border-radius: 3px;
+        margin: 0 3px;
+      }
+      #asteroids-game-wrapper #camera-controls-info {
+        margin-top: 5px;
+        font-size: 10px;
+        color: #888;
+        line-height: 1.5;
+      }
+      #asteroids-game-wrapper #camera-controls-info span {
+        color: #fff;
+        background-color: #333;
+        padding: 2px 5px;
+        border-radius: 3px;
+        margin: 0 3px;
+      }
+      #asteroids-game-wrapper #view-toggle-container {
+        text-align: center;
+        margin-bottom: 15px;
+      }
+      #asteroids-game-wrapper #toggle-view-btn {
+        background-color: #333;
+        color: #0f0;
+        border: 1px solid #0f0;
+        padding: 8px 15px;
+        font-size: 14px;
+        box-shadow: 0 0 8px #0f0;
+      }
+      #asteroids-game-wrapper #toggle-view-btn:hover {
+        background-color: #0f0;
+        color: #000;
+      }
+      #asteroids-game-wrapper #toggle-view-btn:active {
+        box-shadow: none;
+      }
+
+      /* --- Snake Specific Styles --- */
+      #snake-game-wrapper #gameContainer {
+        /* Use original ID within wrapper */
         position: relative;
         width: 85vmin;
         height: 85vmin;
@@ -38,15 +206,16 @@
         cursor: grab;
         margin-bottom: 15px;
       }
-      #gameContainer:active {
+      #snake-game-wrapper #gameContainer:active {
         cursor: grabbing;
       }
-      canvas {
+      #snake-game-wrapper canvas#snake-canvas {
+        /* Specific ID */
         display: block;
         width: 100%;
         height: 100%;
       }
-      #uiContainer {
+      #snake-game-wrapper #uiContainer {
         position: absolute;
         top: 10px;
         left: 10px;
@@ -58,7 +227,12 @@
         pointer-events: none;
         z-index: 10;
       }
-      #messageBox {
+      #snake-game-wrapper #uiContainer #score {
+        /* Be specific */
+        color: #fff; /* White score for snake */
+        text-shadow: 0 0 5px #fff;
+      }
+      #snake-game-wrapper #messageBox {
         position: absolute;
         top: 50%;
         left: 50%;
@@ -73,18 +247,17 @@
         border: 2px solid #fff;
         box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
       }
-      #messageText {
+      #snake-game-wrapper #messageText {
         margin-bottom: 20px;
       }
-      #controlsContainer {
+      #snake-game-wrapper #controlsContainer {
         display: flex;
         gap: 10px;
-      }
-      button {
-        font-family: "Press Start 2P", cursive;
+      } /* Use original ID within wrapper */
+      #snake-game-wrapper button {
+        /* General button style for snake controls */
         padding: 10px 15px;
         font-size: 0.7em;
-        cursor: pointer;
         background: linear-gradient(145deg, #444, #222);
         color: #0f0;
         border: 2px solid #0f0;
@@ -92,31 +265,86 @@
         box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.5),
           inset -2px -2px 3px rgba(0, 0, 0, 0.3),
           inset 2px 2px 3px rgba(255, 255, 255, 0.1);
-        transition: all 0.2s ease;
         pointer-events: auto;
       }
-      button#restartButton {
+      #snake-game-wrapper button#restartButton {
         margin-top: 15px;
         font-size: 0.8em;
         padding: 10px 20px;
       }
-      button:hover {
+      #snake-game-wrapper button:hover {
         background: linear-gradient(145deg, #555, #333);
         box-shadow: 4px 4px 7px rgba(0, 0, 0, 0.6),
           inset -2px -2px 3px rgba(0, 0, 0, 0.3),
           inset 2px 2px 3px rgba(255, 255, 255, 0.1);
         transform: translateY(-1px);
       }
-      button:active {
+      #snake-game-wrapper button:active {
         transform: translateY(1px);
         box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5),
           inset -2px -2px 3px rgba(0, 0, 0, 0.3),
           inset 2px 2px 3px rgba(255, 255, 255, 0.1);
       }
+      /* Back to Menu Button */
+      .back-to-menu-btn {
+        margin-top: 20px;
+        padding: 8px 15px;
+        font-size: 0.8em;
+        background-color: #555;
+        color: #ccc;
+        border: 1px solid #888;
+      }
+      .back-to-menu-btn:hover {
+        background-color: #777;
+        color: #fff;
+      }
     </style>
   </head>
   <body>
-    <div id="gameAndControls">
+    <div id="menu-screen">
+      <h1>3D Arcade</h1>
+      <button id="start-asteroids">Play Asteroids</button>
+      <button id="start-snake">Play 3D Snake</button>
+    </div>
+
+    <div id="asteroids-game-wrapper" class="game-wrapper hidden">
+      <div id="view-toggle-container">
+        <button id="toggle-view-btn">Toggle POV</button>
+      </div>
+      <div id="game-container">
+        <div id="ui-container">
+          <div>
+            <span id="score">Score: 0</span>
+            <span id="level">Level: 1</span>
+          </div>
+          <div id="lives">Lives: 3</div>
+        </div>
+        <div id="message-box">Game Over!</div>
+        <canvas id="asteroids-canvas" tabindex="0"></canvas>
+      </div>
+      <div id="controls-container">
+        <div id="controls-info">
+          Ship: <span>&larr;</span>/<span>&rarr;</span> Rotate Left/Right |
+          <span>W</span>/<span>S</span> Pitch Up/Down |
+          <span>&uarr;</span> Thrust | <span>Space</span> Fire |
+          <span>Enter</span> Restart
+        </div>
+        <div id="camera-controls-info">
+          Camera: Drag L-Mouse = Orbit | Drag R-Mouse = Pan | Scroll = Zoom
+          <br />
+          Keys: <span>I</span>/<span>K</span> Pan Up/Down | <span>J</span>/<span
+            >L</span
+          >
+          Pan Left/Right | <span>U</span>/<span>O</span> Zoom Out/In
+          <br />(Click game area to enable keyboard controls)
+        </div>
+      </div>
+      <button class="back-to-menu-btn" data-game="asteroids">
+        Back to Menu
+      </button>
+    </div>
+
+    <div id="snake-game-wrapper" class="game-wrapper hidden">
       <div id="gameContainer">
         <div id="uiContainer">
           <div id="score">Score: 0</div>
@@ -125,7 +353,7 @@
           <div id="messageText">Game Over!</div>
           <button id="restartButton">Restart</button>
         </div>
-        <canvas id="gameCanvas"></canvas>
+        <canvas id="snake-canvas" tabindex="0"></canvas>
       </div>
       <div id="controlsContainer">
         <button id="topViewBtn">Top</button>
@@ -133,614 +361,1648 @@
         <button id="sideViewBtn">Side</button>
         <button id="resetViewBtn">Reset</button>
       </div>
+      <button class="back-to-menu-btn" data-game="snake">Back to Menu</button>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
     <script>
-      // --- Three.js Setup ---
-      let scene, camera, renderer, controls;
-      let gameContainer, canvas;
+      // ==================================================================
+      // Asteroids Game Object (Refactored)
+      // ==================================================================
+      const AsteroidsGame = {
+        // --- Config Constants ---
+        ASTEROID_SCALE_MIN: 1,
+        ASTEROID_SCALE_MAX: 4,
+        BASE_ASTEROID_SPEED: 0.04,
+        SPEED_INCREASE_PER_LEVEL: 0.005,
+        BASE_ASTEROID_COUNT: 4,
+        ASTEROIDS_PER_LEVEL: 2,
+        ASTEROID_POINTS: 10,
+        SHIP_ROTATION_SPEED: 0.05,
+        SHIP_PITCH_SPEED: 0.03,
+        SHIP_THRUST: 0.001,
+        SHIP_MAX_SPEED: 0.1,
+        SHIP_DRAG: 0.99,
+        BULLET_SPEED: 0.3,
+        BULLET_LIFESPAN: 60,
+        SAFE_ZONE_RADIUS: 10,
+        MAX_SPAWN_RADIUS: 30,
+        INITIAL_LIVES: 3,
+        CAMERA_KEY_PAN_SPEED: 300.0,
+        CAMERA_KEY_ZOOM_SCALE: 1.05,
+        GRID_Y_POSITION: -30,
+        POV_CAMERA_OFFSET: new THREE.Vector3(0, 0.2, 0.5),
+        // --- State & Objects ---
+        scene: null,
+        camera: null,
+        renderer: null,
+        ship: null,
+        clock: null,
+        controls: null,
+        asteroids: [],
+        bullets: [],
+        keys: {},
+        shipVelocity: null,
+        score: 0,
+        lives: 0,
+        currentLevel: 1,
+        isGameOver: false,
+        isPovMode: false,
+        shipShadow: null,
+        animationFrameId: null,
+        isInitialized: false,
+        isRunning: false,
+        // --- UI Elements ---
+        messageBox: null,
+        scoreElement: null,
+        livesElement: null,
+        levelElement: null,
+        gameContainer: null,
+        canvasElement: null,
+        toggleBtn: null,
+        gameWrapper: null,
+        // --- Bound Functions ---
+        boundHandleKeyDown: null,
+        boundHandleKeyUp: null,
+        boundOnWindowResize: null,
+        boundAnimate: null,
 
-      // --- Game Elements ---
-      let food;
-      let snakePositions = [];
-      let snakeMeshes = [];
-      let headSegment;
+        init: function (wrapperId, canvasId) {
+          if (this.isInitialized) return true; // Prevent re-initialization
+          console.log("AsteroidsGame: Initializing...");
+          this.gameWrapper = document.getElementById(wrapperId);
+          if (!this.gameWrapper) {
+            console.error(
+              `AsteroidsGame: Wrapper element #${wrapperId} not found!`
+            );
+            return false;
+          }
+          this.canvasElement = this.gameWrapper.querySelector("#" + canvasId);
+          // ... (find other UI elements within wrapper) ...
+          this.messageBox = this.gameWrapper.querySelector("#message-box");
+          this.scoreElement = this.gameWrapper.querySelector("#score");
+          this.livesElement = this.gameWrapper.querySelector("#lives");
+          this.levelElement = this.gameWrapper.querySelector("#level");
+          this.toggleBtn = this.gameWrapper.querySelector("#toggle-view-btn");
+          this.gameContainer =
+            this.gameWrapper.querySelector("#game-container");
 
-      // --- Constants Definition Order --- <<< FIXED ORDER
-      const SEGMENT_SIZE = 1; // Logical size for movement/grid (Defined first)
-
-      // --- Snake Visual Parameters (Depend on SEGMENT_SIZE) ---
-      const SNAKE_RADIUS = SEGMENT_SIZE * 0.45;
-      const EYE_RADIUS = SNAKE_RADIUS * 0.2;
-      const EYE_COLOR = 0x000000;
-      const HEAD_COLOR = 0x33dd33;
-      const BODY_COLOR = 0x00aa00;
-      const SNAKE_MATERIAL = new THREE.MeshStandardMaterial({
-        color: BODY_COLOR,
-        roughness: 0.5,
-        metalness: 0.1,
-      });
-      const HEAD_MATERIAL = SNAKE_MATERIAL.clone();
-      HEAD_MATERIAL.color.setHex(HEAD_COLOR);
-      const EYE_MATERIAL = new THREE.MeshStandardMaterial({
-        color: EYE_COLOR,
-        roughness: 0.1,
-      });
-
-      // --- Grid and Other Constants ---
-      const GRID_SIZE = 40;
-      const HALF_GRID = GRID_SIZE / 2;
-      const HIGHLIGHT_OFFSET = 0.01;
-      let snakeHeadHighlighter, foodHighlighter;
-
-      // --- Game State ---
-      let direction = new THREE.Vector3(1, 0, 0);
-      let nextDirection = new THREE.Vector3(1, 0, 0);
-      let score = 0;
-      let gameRunning = false;
-      let gameLoopTimeout;
-      const INITIAL_SPEED = 200;
-      let currentSpeed = INITIAL_SPEED;
-      let initialCameraPosition = new THREE.Vector3();
-
-      // --- Constants for Keyboard Orbit ---
-      const ORBIT_ANGLE_STEP = Math.PI / 60;
-      const ORBIT_ZOOM_STEP = 0.95;
-      const ORBIT_DOLLY_STEP = 1 / ORBIT_ZOOM_STEP;
-
-      // --- DOM Elements ---
-      let scoreElement, messageBox, messageText, restartButton;
-      let topViewBtn, frontViewBtn, sideViewBtn, resetViewBtn;
-
-      // --- Initialization ---
-      function init() {
-        // DOM Element references...
-        gameContainer = document.getElementById("gameContainer");
-        canvas = document.getElementById("gameCanvas");
-        scoreElement = document.getElementById("score");
-        messageBox = document.getElementById("messageBox");
-        messageText = document.getElementById("messageText");
-        restartButton = document.getElementById("restartButton");
-        topViewBtn = document.getElementById("topViewBtn");
-        frontViewBtn = document.getElementById("frontViewBtn");
-        sideViewBtn = document.getElementById("sideViewBtn");
-        resetViewBtn = document.getElementById("resetViewBtn");
-
-        // Scene, Camera, Renderer...
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x1a1a1a);
-        const aspect = gameContainer.clientWidth / gameContainer.clientHeight;
-        camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
-        initialCameraPosition.set(0, HALF_GRID * 1.4, HALF_GRID * 1.6);
-        camera.position.copy(initialCameraPosition);
-        camera.lookAt(scene.position);
-        renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
-        renderer.setSize(gameContainer.clientWidth, gameContainer.clientHeight);
-        renderer.setPixelRatio(window.devicePixelRatio);
-
-        // Orbit Controls...
-        controls = new THREE.OrbitControls(camera, renderer.domElement);
-        controls.enableDamping = true;
-        controls.dampingFactor = 0.1;
-        controls.screenSpacePanning = false;
-        controls.maxPolarAngle = Math.PI;
-        controls.minDistance = 3;
-        controls.maxDistance = GRID_SIZE * 2.5;
-        controls.target.set(0, 0, 0);
-        controls.update();
-
-        // Lighting...
-        const ambientLight = new THREE.AmbientLight(0xcccccc, 0.8);
-        scene.add(ambientLight);
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
-        directionalLight.position.set(
-          HALF_GRID * 0.8,
-          HALF_GRID * 2,
-          HALF_GRID * 1.2
-        );
-        scene.add(directionalLight);
-
-        // Game Area Boundaries, Grid Helper...
-        const boundaryGeom = new THREE.BoxGeometry(
-          GRID_SIZE,
-          GRID_SIZE,
-          GRID_SIZE
-        );
-        const boundaryMat = new THREE.MeshBasicMaterial({
-          color: 0x00ffff,
-          wireframe: true,
-          transparent: true,
-          opacity: 0.25,
-        });
-        const boundaryBox = new THREE.Mesh(boundaryGeom, boundaryMat);
-        boundaryBox.position.set(0, 0, 0);
-        scene.add(boundaryBox);
-        const gridHelper = new THREE.GridHelper(
-          GRID_SIZE,
-          GRID_SIZE,
-          0x444444,
-          0x888888
-        );
-        gridHelper.position.y = -HALF_GRID;
-        scene.add(gridHelper);
-
-        // Highlighters...
-        const highlightGeom = new THREE.PlaneGeometry(
-          SEGMENT_SIZE,
-          SEGMENT_SIZE
-        );
-        highlightGeom.rotateX(-Math.PI / 2);
-        const headHighlightMat = new THREE.MeshBasicMaterial({
-          color: 0xffff00,
-          transparent: true,
-          opacity: 0.5,
-          side: THREE.DoubleSide,
-        });
-        snakeHeadHighlighter = new THREE.Mesh(highlightGeom, headHighlightMat);
-        snakeHeadHighlighter.visible = false;
-        scene.add(snakeHeadHighlighter);
-        const foodHighlightMat = new THREE.MeshBasicMaterial({
-          color: 0xffffff,
-          transparent: true,
-          opacity: 0.4,
-          side: THREE.DoubleSide,
-        });
-        foodHighlighter = new THREE.Mesh(
-          highlightGeom.clone(),
-          foodHighlightMat
-        );
-        foodHighlighter.visible = false;
-        scene.add(foodHighlighter);
-
-        // Event Listeners...
-        window.addEventListener("keydown", handleKeyDown);
-        window.addEventListener("resize", onWindowResize);
-        restartButton.addEventListener("click", startGame);
-        topViewBtn.addEventListener("click", setTopView);
-        frontViewBtn.addEventListener("click", setFrontView);
-        sideViewBtn.addEventListener("click", setSideView);
-        resetViewBtn.addEventListener("click", resetView);
-
-        // Initial Setup Message
-        showMessage(
-          "Look: Mouse or I, J, K, L<br>" +
-            "Zoom: Wheel or + / -<br>" +
-            "Move: Arrows or WASD<br>" +
-            "Up/Down: Q / E<br><br>" +
-            "Use View Buttons Below<br>" +
-            "Press Move Key to Start",
-          false
-        );
-
-        // Start render loop
-        animate();
-      }
-
-      // --- Game Logic ---
-
-      function startGame() {
-        clearTimeout(gameLoopTimeout);
-        clearSnakeMeshes();
-        snakePositions = [];
-        if (food) scene.remove(food);
-        food = null;
-        snakeHeadHighlighter.visible = false;
-        foodHighlighter.visible = false;
-
-        score = 0;
-        currentSpeed = INITIAL_SPEED;
-        updateScore();
-        direction.set(1, 0, 0);
-        nextDirection.set(1, 0, 0);
-        gameRunning = true;
-        hideMessage();
-
-        const startOffset = SEGMENT_SIZE * 0.5;
-        const margin = SEGMENT_SIZE * 1.5;
-        const headPosVec = new THREE.Vector3(
-          -HALF_GRID + margin,
-          startOffset,
-          -HALF_GRID + margin
-        );
-        const bodyPosVec = headPosVec
-          .clone()
-          .sub(direction.clone().multiplyScalar(SEGMENT_SIZE));
-        snakePositions.push(headPosVec);
-        snakePositions.push(bodyPosVec);
-
-        drawSnake(); // Initial draw
-        createFood();
-        gameLoop();
-      }
-
-      function gameLoop() {
-        if (!gameRunning) return;
-
-        if (!nextDirection.equals(direction.clone().negate())) {
-          direction.copy(nextDirection);
-        }
-
-        const currentHeadPos = snakePositions[0];
-        const newHeadPosition = currentHeadPos
-          .clone()
-          .addScaledVector(direction, SEGMENT_SIZE);
-
-        // Boundary Collision
-        if (
-          Math.abs(newHeadPosition.x) >= HALF_GRID ||
-          Math.abs(newHeadPosition.y) >= HALF_GRID ||
-          Math.abs(newHeadPosition.z) >= HALF_GRID
-        ) {
-          gameOver("Hit the wall!");
-          return;
-        }
-
-        // Self Collision
-        for (let i = 3; i < snakePositions.length; i++) {
           if (
-            newHeadPosition.distanceTo(snakePositions[i]) <
-            SEGMENT_SIZE * 0.8
+            !this.canvasElement ||
+            !this.messageBox ||
+            !this.scoreElement ||
+            !this.livesElement ||
+            !this.levelElement ||
+            !this.toggleBtn ||
+            !this.gameContainer
           ) {
-            gameOver("Ate yourself!");
+            console.error(
+              "AsteroidsGame: Failed to find all required UI elements."
+            );
+            return false;
+          }
+
+          this.boundHandleKeyDown = this.handleKeyDown.bind(this);
+          this.boundHandleKeyUp = this.handleKeyUp.bind(this);
+          this.boundOnWindowResize = this.onWindowResize.bind(this);
+          this.boundAnimate = this.animate.bind(this);
+
+          try {
+            if (typeof THREE === "undefined")
+              throw new Error("THREE object not defined.");
+            this.scene = new THREE.Scene();
+            this.clock = new THREE.Clock();
+            this.shipVelocity = new THREE.Vector3();
+            this.keys = {};
+
+            const aspect =
+              this.gameContainer.clientWidth / this.gameContainer.clientHeight;
+            this.camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+
+            this.renderer = new THREE.WebGLRenderer({
+              canvas: this.canvasElement,
+              antialias: true,
+            });
+            this.renderer.setSize(
+              this.gameContainer.clientWidth,
+              this.gameContainer.clientHeight
+            );
+            this.renderer.setPixelRatio(window.devicePixelRatio);
+            this.renderer.setClearColor(0x000000);
+
+            if (typeof THREE.OrbitControls !== "undefined") {
+              this.controls = new THREE.OrbitControls(
+                this.camera,
+                this.canvasElement
+              );
+              this.controls.enableDamping = true;
+              this.controls.dampingFactor = 0.05;
+              this.controls.screenSpacePanning = false;
+              this.controls.enablePan = true;
+              this.controls.enableZoom = true;
+              this.controls.target.set(0, 0, 0);
+              this.controls.maxDistance = 100;
+              this.controls.minDistance = 5;
+            } else {
+              console.warn("AsteroidsGame: OrbitControls not loaded.");
+              this.controls = null;
+            }
+
+            this.setupSceneExtras();
+            this.createShip(); // Create ship object but don't add yet
+
+            this.isInitialized = true;
+            console.log("AsteroidsGame: Initialization complete.");
+            return true;
+          } catch (error) {
+            console.error("AsteroidsGame: Error during initialization:", error);
+            this.showMessage(`Initialization Error: ${error.message}`);
+            return false;
+          }
+        },
+        startGame: function () {
+          if (!this.isInitialized) {
+            console.error("AsteroidsGame: Not initialized.");
             return;
           }
-        }
-
-        // Food Collision
-        let ateFood = false;
-        if (food && newHeadPosition.distanceTo(food.position) < SEGMENT_SIZE) {
-          ateFood = true;
-          score++;
-          updateScore();
-          scene.remove(food);
-          food = null;
-          foodHighlighter.visible = false;
-          createFood();
-          currentSpeed = Math.max(50, currentSpeed * 0.95);
-        }
-
-        // Update Snake Positions
-        snakePositions.unshift(newHeadPosition);
-        if (!ateFood) {
-          snakePositions.pop();
-        }
-
-        // Redraw Snake & Update Highlighters
-        drawSnake();
-        updateHighlighters();
-
-        gameLoopTimeout = setTimeout(gameLoop, currentSpeed);
-      }
-
-      // --- Snake Drawing Functions ---
-
-      function clearSnakeMeshes() {
-        snakeMeshes.forEach((mesh) => {
-          if (mesh === headSegment && mesh.children.length > 0) {
-            [...mesh.children].forEach((child) => mesh.remove(child));
+          if (this.isRunning) return; // Prevent multiple starts
+          console.log("AsteroidsGame: Starting game...");
+          this.isRunning = true;
+          this.addListeners(); // Add listeners only when game starts
+          this.resetGame(); // Resets level, score, lives, objects, camera
+          this.animationLoopRunning = false;
+          if (this.animationFrameId)
+            cancelAnimationFrame(this.animationFrameId);
+          this.animate();
+          this.canvasElement.focus(); // Focus canvas for keys
+          console.log("AsteroidsGame: Game loop started.");
+        },
+        stopGame: function () {
+          if (!this.isRunning) return;
+          console.log("AsteroidsGame: Stopping game...");
+          this.isRunning = false;
+          if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
           }
-          scene.remove(mesh);
-        });
-        snakeMeshes = [];
-        headSegment = null;
-      }
-
-      function drawSnake() {
-        clearSnakeMeshes();
-
-        if (snakePositions.length === 0) return;
-
-        const sphereGeometry = new THREE.SphereGeometry(SNAKE_RADIUS, 16, 12);
-        const cylinderGeometry = new THREE.CylinderGeometry(
-          SNAKE_RADIUS,
-          SNAKE_RADIUS,
-          1,
-          12
-        );
-        const eyeGeometry = new THREE.SphereGeometry(EYE_RADIUS, 8, 6);
-
-        for (let i = 0; i < snakePositions.length; i++) {
-          const pos = snakePositions[i];
-          const isHead = i === 0;
-
-          const sphereMaterial = isHead ? HEAD_MATERIAL : SNAKE_MATERIAL;
-          const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-          sphere.position.copy(pos);
-          scene.add(sphere);
-          snakeMeshes.push(sphere);
-
-          if (isHead) {
-            headSegment = sphere;
-            const eyeY = SNAKE_RADIUS * 0.3;
-            const eyeZ = SNAKE_RADIUS * 0.8;
-            const eyeX = SNAKE_RADIUS * 0.6;
-            const eyeL = new THREE.Mesh(eyeGeometry, EYE_MATERIAL);
-            eyeL.position.set(eyeX, eyeY, eyeZ);
-            headSegment.add(eyeL);
-
-            const eyeR = new THREE.Mesh(eyeGeometry, EYE_MATERIAL);
-            eyeR.position.set(-eyeX, eyeY, eyeZ);
-            headSegment.add(eyeR);
-
-            const lookTarget = pos.clone().add(direction);
-            headSegment.lookAt(lookTarget);
+          this.removeListeners();
+          // Optional: Clear scene if needed
+          // this.clearScene();
+          console.log("AsteroidsGame: Game stopped.");
+        },
+        addListeners: function () {
+          if (this.canvasElement) {
+            this.canvasElement.addEventListener(
+              "keydown",
+              this.boundHandleKeyDown
+            );
+            this.canvasElement.addEventListener("keyup", this.boundHandleKeyUp);
           }
-
-          if (i < snakePositions.length - 1) {
-            const nextPos = snakePositions[i + 1];
-            const distance = pos.distanceTo(nextPos);
-            const cylinder = new THREE.Mesh(cylinderGeometry, SNAKE_MATERIAL);
-            cylinder.scale.y = distance;
-            cylinder.position.lerpVectors(pos, nextPos, 0.5);
-            cylinder.lookAt(nextPos);
-            cylinder.rotateX(Math.PI / 2);
-            scene.add(cylinder);
-            snakeMeshes.push(cylinder);
+          window.addEventListener("resize", this.boundOnWindowResize);
+          if (this.toggleBtn) {
+            this.toggleBtn.onclick = () => {
+              this.isPovMode = !this.isPovMode;
+              this.setCameraMode();
+            };
           }
-        }
-      }
-
-      function createFood() {
-        const geometry = new THREE.SphereGeometry(SEGMENT_SIZE / 2, 16, 16);
-        const material = new THREE.MeshStandardMaterial({
-          color: 0xff3333,
-          emissive: 0x550000,
-          roughness: 0.4,
-          metalness: 0.1,
-        });
-        food = new THREE.Mesh(geometry, material);
-
-        let foodPosition;
-        let positionOccupied;
-        const maxAttempts = GRID_SIZE * GRID_SIZE * GRID_SIZE;
-        let attempts = 0;
-        do {
-          positionOccupied = false;
-          const range = GRID_SIZE - 2;
-          const minVal = -HALF_GRID + 1;
-          const x = Math.floor(Math.random() * range) + minVal;
-          const y = Math.floor(Math.random() * range) + minVal;
-          const z = Math.floor(Math.random() * range) + minVal;
-          foodPosition = new THREE.Vector3(
-            x + 0.5,
-            y + 0.5,
-            z + 0.5
-          ).multiplyScalar(SEGMENT_SIZE);
-          for (const segmentPos of snakePositions) {
-            if (foodPosition.distanceTo(segmentPos) < SEGMENT_SIZE * 0.5) {
-              positionOccupied = true;
-              break;
+          console.log("AsteroidsGame: Listeners added.");
+        },
+        removeListeners: function () {
+          if (this.canvasElement) {
+            this.canvasElement.removeEventListener(
+              "keydown",
+              this.boundHandleKeyDown
+            );
+            this.canvasElement.removeEventListener(
+              "keyup",
+              this.boundHandleKeyUp
+            );
+          }
+          window.removeEventListener("resize", this.boundOnWindowResize);
+          if (this.toggleBtn) {
+            this.toggleBtn.onclick = null;
+          }
+          console.log("AsteroidsGame: Listeners removed.");
+        },
+        // --- (Rest of AsteroidsGame methods: setupSceneExtras, setCameraMode, createShip, createAsteroids, createAsteroid, updateShip, updateAsteroids, updateBullets, handleCameraKeyboardInput, wrapAroundScreen, checkCollisions, splitAsteroid, handlePlayerHit, resetShipPosition, gameOver, resetGame, updateUI, showMessage, handleKeyDown, handleKeyUp, onWindowResize, animate - kept mostly the same as previous version, ensuring 'this' is used correctly) ---
+        setupSceneExtras: function () {
+          const ambientLight = new THREE.AmbientLight(0x505050);
+          this.scene.add(ambientLight);
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+          directionalLight.position.set(5, 10, 7.5);
+          this.scene.add(directionalLight);
+          const boundarySize = this.MAX_SPAWN_RADIUS;
+          const playVolume = new THREE.Box3(
+            new THREE.Vector3(-boundarySize, -boundarySize, -boundarySize),
+            new THREE.Vector3(boundarySize, boundarySize, boundarySize)
+          );
+          const boxHelper = new THREE.Box3Helper(playVolume, 0x00ffff);
+          this.scene.add(boxHelper);
+          const gridSize = this.MAX_SPAWN_RADIUS * 2;
+          const gridDivisions = 20;
+          const gridHelper = new THREE.GridHelper(
+            gridSize,
+            gridDivisions,
+            0x444444,
+            0x888888
+          );
+          gridHelper.position.y = this.GRID_Y_POSITION;
+          this.scene.add(gridHelper);
+          const shadowGeo = new THREE.CircleGeometry(0.8, 16);
+          const shadowMat = new THREE.MeshBasicMaterial({
+            color: 0x777777,
+            transparent: true,
+            opacity: 0.7,
+          });
+          this.shipShadow = new THREE.Mesh(shadowGeo, shadowMat);
+          this.shipShadow.rotation.x = -Math.PI / 2;
+          this.shipShadow.position.y = this.GRID_Y_POSITION + 0.01;
+          this.scene.add(this.shipShadow);
+        },
+        setCameraMode: function () {
+          /* ... (same as before, using this.) ... */
+          if (!this.ship || !this.ship.material) return;
+          if (this.isPovMode) {
+            this.ship.material.transparent = true;
+            this.ship.material.opacity = 0;
+            this.ship.material.needsUpdate = true;
+            if (this.controls) this.controls.enabled = false;
+          } else {
+            this.ship.material.transparent = false;
+            this.ship.material.opacity = 1;
+            this.ship.material.needsUpdate = true;
+            if (this.controls) {
+              this.controls.enabled = true;
+              this.camera.position.set(0, 15, 35);
+              this.controls.target.set(0, 0, 0);
+              this.controls.update();
+            } else {
+              this.camera.position.set(0, 15, 35);
+              this.camera.lookAt(0, 0, 0);
             }
           }
-          attempts++;
-        } while (positionOccupied && attempts < maxAttempts);
-
-        if (attempts >= maxAttempts) {
-          console.warn("Could not find empty spot for food!");
-          return;
-        }
-        food.position.copy(foodPosition);
-        scene.add(food);
-        updateHighlighters();
-      }
-
-      function updateHighlighters() {
-        if (snakePositions.length > 0) {
-          const headPos = snakePositions[0];
-          snakeHeadHighlighter.position.set(
-            headPos.x,
-            -HALF_GRID + HIGHLIGHT_OFFSET,
-            headPos.z
+        },
+        createShip: function () {
+          /* ... (same as before, using this.) ... */
+          const geometry = new THREE.ConeGeometry(0.5, 1.5, 4);
+          const material = new THREE.MeshPhongMaterial({
+            color: 0x00ff00,
+            flatShading: true,
+            transparent: true,
+            opacity: 1,
+          });
+          this.ship = new THREE.Mesh(geometry, material);
+          this.ship.rotation.x = Math.PI / 2;
+          this.ship.userData.radius = 0.75;
+          // Don't add to scene here, add in resetGame
+          // Add Reticle
+          const reticleDistance = 4;
+          const reticleGeo = new THREE.RingGeometry(0.08, 0.12, 16);
+          const reticleMat = new THREE.MeshBasicMaterial({
+            color: 0x00ff00,
+            side: THREE.DoubleSide,
+            depthTest: false,
+            depthWrite: false,
+          });
+          const targetingReticle = new THREE.Mesh(reticleGeo, reticleMat);
+          targetingReticle.position.set(0, reticleDistance, 0);
+          targetingReticle.userData.isReticle = true;
+          this.ship.add(targetingReticle);
+        },
+        createAsteroids: function () {
+          /* ... (same as before, using this.) ... */
+          this.asteroids.forEach((a) => {
+            if (a && a.parent) this.scene.remove(a);
+          });
+          this.asteroids = [];
+          const numAsteroids =
+            this.BASE_ASTEROID_COUNT +
+            (this.currentLevel - 1) * this.ASTEROIDS_PER_LEVEL;
+          console.log(
+            `AsteroidsGame: Level ${this.currentLevel}: Spawning ${numAsteroids} asteroids.`
           );
-          snakeHeadHighlighter.visible = true;
-        } else {
-          snakeHeadHighlighter.visible = false;
-        }
-        if (food) {
-          const foodPos = food.position;
-          foodHighlighter.position.set(
-            foodPos.x,
-            -HALF_GRID + HIGHLIGHT_OFFSET,
-            foodPos.z
-          );
-          foodHighlighter.visible = true;
-        } else {
-          foodHighlighter.visible = false;
-        }
-      }
-
-      function gameOver(reason) {
-        gameRunning = false;
-        clearTimeout(gameLoopTimeout);
-        snakeHeadHighlighter.visible = false;
-        showMessage(`Game Over! ${reason}<br>Final Score: ${score}`);
-      }
-      function updateScore() {
-        scoreElement.textContent = `Score: ${score}`;
-      }
-      function showMessage(message, showButton = true) {
-        messageText.innerHTML = message;
-        restartButton.style.display = showButton ? "inline-block" : "none";
-        messageBox.style.display = "block";
-      }
-      function hideMessage() {
-        messageBox.style.display = "none";
-        if (!gameRunning) controls.enabled = true;
-      }
-
-      // --- Camera View Functions ---
-      function setCameraView(x, y, z, upX = 0, upY = 1, upZ = 0) {
-        camera.position.set(x, y, z);
-        camera.up.set(upX, upY, upZ);
-        camera.lookAt(controls.target);
-        controls.update();
-      }
-      function setTopView() {
-        setCameraView(0, GRID_SIZE * 1.5, 0, 0, 0, -1);
-      }
-      function setFrontView() {
-        setCameraView(0, 0, GRID_SIZE * 1.5, 0, 1, 0);
-      }
-      function setSideView() {
-        setCameraView(GRID_SIZE * 1.5, 0, 0, 0, 1, 0);
-      }
-      function resetView() {
-        setCameraView(
-          initialCameraPosition.x,
-          initialCameraPosition.y,
-          initialCameraPosition.z,
-          0,
-          1,
-          0
-        );
-      }
-
-      // --- Event Handlers ---
-      function handleKeyDown(event) {
-        const movementKeys = [
-          "ArrowUp",
-          "ArrowDown",
-          "ArrowLeft",
-          "ArrowRight",
-          "KeyW",
-          "KeyS",
-          "KeyA",
-          "KeyD",
-          "KeyQ",
-          "KeyE",
-          "PageUp",
-          "PageDown",
-        ];
-        const orbitKeys = [
-          "KeyI",
-          "KeyJ",
-          "KeyK",
-          "KeyL",
-          "Minus",
-          "Equal",
-          "NumpadSubtract",
-          "NumpadAdd",
-        ];
-        if (
-          movementKeys.includes(event.code) ||
-          orbitKeys.includes(event.code)
-        ) {
-          event.preventDefault();
-        }
-
-        // Orbit Controls
-        let orbitChanged = false;
-        switch (event.code) {
-          case "KeyI":
-            controls.rotateUp(ORBIT_ANGLE_STEP);
-            orbitChanged = true;
-            break;
-          case "KeyK":
-            controls.rotateUp(-ORBIT_ANGLE_STEP);
-            orbitChanged = true;
-            break;
-          case "KeyJ":
-            controls.rotateLeft(ORBIT_ANGLE_STEP);
-            orbitChanged = true;
-            break;
-          case "KeyL":
-            controls.rotateLeft(-ORBIT_ANGLE_STEP);
-            orbitChanged = true;
-            break;
-          case "Minus":
-          case "NumpadSubtract":
-            controls.dollyOut(ORBIT_DOLLY_STEP);
-            orbitChanged = true;
-            break;
-          case "Equal":
-          case "NumpadAdd":
-            controls.dollyIn(ORBIT_DOLLY_STEP);
-            orbitChanged = true;
-            break;
-        }
-        if (orbitChanged && messageBox.style.display === "none") {
-          controls.update();
-        }
-
-        // Game Start
-        if (!gameRunning && movementKeys.includes(event.code)) {
-          if (
-            (messageBox.style.display === "block" &&
-              !restartButton.style.display) ||
-            restartButton.style.display === "none"
-          ) {
-            startGame();
-          } else if (!gameRunning && messageBox.style.display !== "block") {
-            startGame();
+          for (let i = 0; i < numAsteroids; i++) this.createAsteroid();
+        },
+        createAsteroid: function (position, scale) {
+          /* ... (same as before, using this.) ... */
+          const detail = 1;
+          const geometry = new THREE.IcosahedronGeometry(1, detail);
+          const positionAttribute = geometry.attributes.position;
+          const vertex = new THREE.Vector3();
+          for (let i = 0; i < positionAttribute.count; i++) {
+            vertex.fromBufferAttribute(positionAttribute, i);
+            vertex.multiplyScalar(1 + Math.random() * 0.4 - 0.2);
+            positionAttribute.setXYZ(i, vertex.x, vertex.y, vertex.z);
           }
-          return;
+          geometry.computeVertexNormals();
+          const greyValue = 0.5 + Math.random() * 0.3;
+          const randomGreyColor = new THREE.Color(
+            greyValue,
+            greyValue,
+            greyValue
+          );
+          const material = new THREE.MeshPhongMaterial({
+            color: randomGreyColor,
+            flatShading: true,
+          });
+          const asteroid = new THREE.Mesh(geometry, material);
+          const randomScale =
+            scale ||
+            Math.random() *
+              (this.ASTEROID_SCALE_MAX - this.ASTEROID_SCALE_MIN) +
+              this.ASTEROID_SCALE_MIN;
+          asteroid.scale.set(randomScale, randomScale, randomScale);
+          asteroid.userData.radius = randomScale * 0.8;
+          if (!position) {
+            const radius =
+              this.SAFE_ZONE_RADIUS +
+              Math.random() * (this.MAX_SPAWN_RADIUS - this.SAFE_ZONE_RADIUS);
+            const theta = Math.random() * Math.PI * 2;
+            const phi = Math.acos(Math.random() * 2 - 1);
+            position = new THREE.Vector3(
+              radius * Math.sin(phi) * Math.cos(theta),
+              radius * Math.sin(phi) * Math.sin(theta),
+              radius * Math.cos(phi)
+            );
+            if (position.length() < this.SAFE_ZONE_RADIUS) {
+              position.normalize().multiplyScalar(this.SAFE_ZONE_RADIUS + 1);
+            }
+          }
+          asteroid.position.copy(position);
+          const currentSpeed =
+            this.BASE_ASTEROID_SPEED +
+            (this.currentLevel - 1) * this.SPEED_INCREASE_PER_LEVEL;
+          asteroid.userData.velocity = new THREE.Vector3(
+            Math.random() - 0.5,
+            Math.random() - 0.5,
+            Math.random() - 0.5
+          )
+            .normalize()
+            .multiplyScalar(currentSpeed * (0.75 + Math.random() * 0.5));
+          this.asteroids.push(asteroid);
+          this.scene.add(asteroid);
+          return asteroid;
+        },
+        createBullet: function () {
+          /* ... (same as before, using this.) ... */
+          if (!this.ship) return;
+          const geometry = new THREE.SphereGeometry(0.15, 8, 8);
+          const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+          const bullet = new THREE.Mesh(geometry, material);
+          bullet.position.copy(this.ship.position);
+          const shipForward = new THREE.Vector3(0, 1, 0);
+          shipForward.applyQuaternion(this.ship.quaternion);
+          bullet.userData.velocity = shipForward
+            .multiplyScalar(this.BULLET_SPEED)
+            .add(this.shipVelocity);
+          bullet.userData.lifespan = this.BULLET_LIFESPAN;
+          bullet.userData.radius = 0.15;
+          this.bullets.push(bullet);
+          this.scene.add(bullet);
+        },
+        updateShip: function (deltaTime) {
+          /* ... (same as before, using this.) ... */
+          if (this.isGameOver || !this.ship || !this.ship.parent) return;
+          if (this.keys["ArrowLeft"]) {
+            this.ship.rotation.z += this.SHIP_ROTATION_SPEED;
+          }
+          if (this.keys["ArrowRight"]) {
+            this.ship.rotation.z -= this.SHIP_ROTATION_SPEED;
+          }
+          if (this.keys["KeyW"]) {
+            this.ship.rotateX(this.SHIP_PITCH_SPEED);
+          }
+          if (this.keys["KeyS"]) {
+            this.ship.rotateX(-this.SHIP_PITCH_SPEED);
+          }
+          if (this.keys["ArrowUp"]) {
+            const thrustVector = new THREE.Vector3(0, this.SHIP_THRUST, 0);
+            thrustVector.applyQuaternion(this.ship.quaternion);
+            this.shipVelocity.add(thrustVector);
+            if (this.shipVelocity.length() > this.SHIP_MAX_SPEED)
+              this.shipVelocity.normalize().multiplyScalar(this.SHIP_MAX_SPEED);
+          }
+          this.shipVelocity.multiplyScalar(this.SHIP_DRAG);
+          this.ship.position.add(this.shipVelocity);
+          this.wrapAroundScreen(this.ship, this.MAX_SPAWN_RADIUS * 1.2);
+          if (this.shipShadow) {
+            this.shipShadow.position.x = this.ship.position.x;
+            this.shipShadow.position.z = this.ship.position.z;
+          }
+          const reticle = this.ship.children.find(
+            (child) => child.userData.isReticle
+          );
+          if (reticle && !this.isPovMode) {
+            reticle.lookAt(this.camera.position);
+          }
+        },
+        updateAsteroids: function (deltaTime) {
+          /* ... (same as before, using this.) ... */
+          this.asteroids.forEach((asteroid) => {
+            if (!asteroid || !asteroid.parent) return;
+            asteroid.position.add(asteroid.userData.velocity);
+            asteroid.rotation.x += 0.01;
+            asteroid.rotation.y += 0.005;
+            asteroid.rotation.z += 0.003;
+            this.wrapAroundScreen(asteroid, this.MAX_SPAWN_RADIUS);
+          });
+        },
+        updateBullets: function (deltaTime) {
+          /* ... (same as before, using this.) ... */
+          for (let i = this.bullets.length - 1; i >= 0; i--) {
+            const bullet = this.bullets[i];
+            if (!bullet || !bullet.parent) {
+              this.bullets.splice(i, 1);
+              continue;
+            }
+            bullet.position.add(bullet.userData.velocity);
+            bullet.userData.lifespan--;
+            if (
+              bullet.userData.lifespan <= 0 ||
+              bullet.position.length() > this.MAX_SPAWN_RADIUS * 1.5
+            ) {
+              this.scene.remove(bullet);
+              this.bullets.splice(i, 1);
+            }
+          }
+        },
+        handleCameraKeyboardInput: function (deltaTime) {
+          /* ... (same as before, using this.) ... */
+          if (
+            this.isPovMode ||
+            !this.controls ||
+            typeof this.controls.panLeft !== "function" ||
+            typeof this.controls.panUp !== "function" ||
+            typeof this.controls.dollyIn !== "function" ||
+            typeof this.controls.dollyOut !== "function"
+          )
+            return;
+          if (deltaTime <= 0) return;
+          const panSpeed = this.CAMERA_KEY_PAN_SPEED * deltaTime;
+          const zoomScale = this.CAMERA_KEY_ZOOM_SCALE;
+          if (this.keys["KeyJ"]) {
+            this.controls.panLeft(panSpeed, this.camera.matrix);
+          }
+          if (this.keys["KeyL"]) {
+            this.controls.panLeft(-panSpeed, this.camera.matrix);
+          }
+          if (this.keys["KeyI"]) {
+            this.controls.panUp(panSpeed, this.camera.matrix);
+          }
+          if (this.keys["KeyK"]) {
+            this.controls.panUp(-panSpeed, this.camera.matrix);
+          }
+          if (this.keys["KeyO"]) {
+            this.controls.dollyOut(zoomScale);
+          }
+          if (this.keys["KeyU"]) {
+            this.controls.dollyIn(zoomScale);
+          }
+        },
+        wrapAroundScreen: function (object, boundaryRadius) {
+          /* ... (same as before, using this.) ... */
+          if (!object || !object.parent) return;
+          const buffer = object.userData.radius || 1;
+          const limit = boundaryRadius + buffer;
+          if (object.position.x > limit) object.position.x = -limit;
+          if (object.position.x < -limit) object.position.x = limit;
+          if (object.position.y > limit) object.position.y = -limit;
+          if (object.position.y < -limit) object.position.y = limit;
+          if (object.position.z > limit) object.position.z = -limit;
+          if (object.position.z < -limit) object.position.z = limit;
+        },
+        checkCollisions: function () {
+          /* ... (same as before, using this.) ... */
+          if (this.isGameOver || !this.ship || !this.ship.parent) return;
+          for (let i = this.bullets.length - 1; i >= 0; i--) {
+            const bullet = this.bullets[i];
+            if (!bullet || !bullet.parent) continue;
+            for (let j = this.asteroids.length - 1; j >= 0; j--) {
+              const asteroid = this.asteroids[j];
+              if (!asteroid || !asteroid.parent) continue;
+              if (
+                asteroid.visible &&
+                bullet.position.distanceTo(asteroid.position) <
+                  bullet.userData.radius + asteroid.userData.radius
+              ) {
+                this.scene.remove(bullet);
+                this.bullets.splice(i, 1);
+                this.splitAsteroid(asteroid, j);
+                this.score += this.ASTEROID_POINTS;
+                this.updateUI();
+                break;
+              }
+            }
+          }
+          if (!this.isPovMode) {
+            for (let j = this.asteroids.length - 1; j >= 0; j--) {
+              const asteroid = this.asteroids[j];
+              if (!asteroid || !asteroid.parent) continue;
+              if (
+                asteroid.visible &&
+                this.ship.position.distanceTo(asteroid.position) <
+                  this.ship.userData.radius + asteroid.userData.radius
+              ) {
+                this.handlePlayerHit(asteroid, j);
+                break;
+              }
+            }
+          }
+        },
+        splitAsteroid: function (asteroid, index) {
+          /* ... (same as before, using this.) ... */
+          if (!asteroid || !asteroid.parent) return;
+          const currentScale = asteroid.scale.x;
+          const newScale = currentScale / 2;
+          this.scene.remove(asteroid);
+          this.asteroids.splice(index, 1);
+          if (newScale >= this.ASTEROID_SCALE_MIN) {
+            const numSplits = Math.floor(Math.random() * 2) + 2;
+            for (let k = 0; k < numSplits; k++) {
+              try {
+                const spawnPos = asteroid.position
+                  .clone()
+                  .add(
+                    new THREE.Vector3(
+                      Math.random() - 0.5,
+                      Math.random() - 0.5,
+                      Math.random() - 0.5
+                    ).multiplyScalar(newScale * 2)
+                  );
+                const smallerAsteroid = this.createAsteroid(spawnPos, newScale);
+                if (smallerAsteroid) {
+                  const baseVel =
+                    asteroid.userData.velocity || new THREE.Vector3();
+                  smallerAsteroid.userData.velocity
+                    .copy(baseVel)
+                    .multiplyScalar(1.1);
+                  smallerAsteroid.userData.velocity.add(
+                    new THREE.Vector3(
+                      Math.random() - 0.5,
+                      Math.random() - 0.5,
+                      Math.random() - 0.5
+                    ).multiplyScalar(this.BASE_ASTEROID_SPEED * 0.8)
+                  );
+                }
+              } catch (e) {
+                console.error(
+                  "AsteroidsGame: Error creating split asteroid:",
+                  e
+                );
+              }
+            }
+          }
+          if (this.asteroids.length === 0 && !this.isGameOver) {
+            this.currentLevel++;
+            this.updateUI();
+            this.showMessage(
+              `Level ${this.currentLevel - 1} Complete! Starting Level ${
+                this.currentLevel
+              }...`,
+              2500
+            );
+            setTimeout(this.createAsteroids.bind(this), 2600);
+          }
+        },
+        handlePlayerHit: function (asteroid, index) {
+          /* ... (same as before, using this.) ... */
+          this.lives--;
+          this.updateUI();
+          if (this.lives <= 0) {
+            this.gameOver();
+          } else {
+            this.showMessage(`Hit! ${this.lives} lives left.`, 1500);
+            if (this.ship && this.ship.parent) this.scene.remove(this.ship);
+            if (asteroid && asteroid.parent) this.scene.remove(asteroid);
+            if (index >= 0 && index < this.asteroids.length)
+              this.asteroids.splice(index, 1);
+            this.bullets.forEach((b) => {
+              if (b && b.parent) this.scene.remove(b);
+            });
+            this.bullets = [];
+            setTimeout(() => {
+              if (this.lives > 0 && !this.isGameOver) {
+                this.resetShipPosition();
+                if (this.ship && !this.scene.getObjectById(this.ship.id))
+                  this.scene.add(this.ship);
+                this.setCameraMode();
+              }
+            }, 1600);
+          }
+        },
+        resetShipPosition: function () {
+          /* ... (same as before, using this.) ... */
+          if (!this.ship) return;
+          this.ship.position.set(0, 0, 0);
+          this.ship.rotation.set(Math.PI / 2, 0, 0);
+          this.shipVelocity.set(0, 0, 0);
+        },
+        gameOver: function () {
+          /* ... (same as before, using this.) ... */
+          this.isGameOver = true;
+          this.showMessage(
+            `Game Over! Score: ${this.score}\nLevel: ${this.currentLevel}\nPress Enter to Restart`
+          );
+          if (this.ship && this.ship.parent) this.scene.remove(this.ship);
+        },
+        resetGame: function () {
+          /* ... (same as before, using this.) ... */
+          console.log("AsteroidsGame: Resetting game...");
+          this.score = 0;
+          this.lives = this.INITIAL_LIVES;
+          this.currentLevel = 1;
+          this.isGameOver = false;
+          if (this.messageBox) this.messageBox.style.display = "none";
+          this.bullets.forEach((b) => {
+            if (b && b.parent) this.scene.remove(b);
+          });
+          this.bullets = [];
+          this.asteroids.forEach((a) => {
+            if (a && a.parent) this.scene.remove(a);
+          });
+          this.asteroids = [];
+          this.resetShipPosition();
+          if (this.ship && !this.scene.getObjectById(this.ship.id))
+            this.scene.add(this.ship);
+          this.createAsteroids();
+          this.updateUI();
+          this.isPovMode = false;
+          this.setCameraMode();
+          if (this.camera && this.controls) {
+            console.log("AsteroidsGame: Camera reset called in resetGame.");
+          } else {
+            console.warn(
+              "AsteroidsGame: Camera or controls not available for reset."
+            );
+          }
+        },
+        updateUI: function () {
+          /* ... (same as before, using this.) ... */
+          if (this.scoreElement)
+            this.scoreElement.textContent = `Score: ${this.score}`;
+          if (this.livesElement)
+            this.livesElement.textContent = `Lives: ${this.lives}`;
+          if (this.levelElement)
+            this.levelElement.textContent = `Level: ${this.currentLevel}`;
+        },
+        showMessage: function (text, duration = null) {
+          /* ... (same as before, using this.) ... */
+          if (!this.messageBox) return;
+          this.messageBox.textContent = text;
+          this.messageBox.style.display = "block";
+          if (this.messageBox.timeoutId)
+            clearTimeout(this.messageBox.timeoutId);
+          if (duration) {
+            this.messageBox.timeoutId = setTimeout(() => {
+              if (this.messageBox) this.messageBox.style.display = "none";
+              this.messageBox.timeoutId = null;
+            }, duration);
+          } else {
+            this.messageBox.timeoutId = null;
+          }
+        },
+        handleKeyDown: function (event) {
+          /* ... (same as before, using this.) ... */
+          this.keys[event.code] = true;
+          if (!this.isGameOver && event.code === "Space") {
+            if (this.ship && this.ship.parent) this.createBullet();
+          }
+          if (this.isGameOver && event.code === "Enter") {
+            this.resetGame();
+          }
+          if (
+            [
+              "ArrowUp",
+              "ArrowDown",
+              "ArrowLeft",
+              "ArrowRight",
+              "Space",
+              "KeyW",
+              "KeyS",
+            ].includes(event.code)
+          ) {
+            event.preventDefault();
+          }
+        },
+        handleKeyUp: function (event) {
+          /* ... (same as before, using this.) ... */
+          this.keys[event.code] = false;
+        },
+        onWindowResize: function () {
+          /* ... (same as before, using this.) ... */
+          if (!this.camera || !this.renderer || !this.gameContainer) return;
+          const width = this.gameContainer.clientWidth;
+          const height = this.gameContainer.clientHeight;
+          if (width <= 0 || height <= 0) return;
+          this.camera.aspect = width / height;
+          this.camera.updateProjectionMatrix();
+          this.renderer.setSize(width, height);
+        },
+        animate: function () {
+          /* ... (same as before, using this.) ... */
+          this.animationFrameId = requestAnimationFrame(this.boundAnimate);
+          const deltaTime = this.clock.getDelta();
+          if (this.isPovMode && this.ship) {
+            const cameraPos = this.POV_CAMERA_OFFSET.clone()
+              .applyQuaternion(this.ship.quaternion)
+              .add(this.ship.position);
+            this.camera.position.copy(cameraPos);
+            this.camera.quaternion.copy(this.ship.quaternion);
+            this.camera.rotateX(Math.PI / 2);
+          } else if (
+            this.controls &&
+            typeof this.controls.update === "function"
+          ) {
+            this.handleCameraKeyboardInput(deltaTime);
+            this.controls.update();
+          }
+          if (!this.isGameOver && this.scene) {
+            this.updateShip(deltaTime);
+            this.updateAsteroids(deltaTime);
+            this.updateBullets(deltaTime);
+            this.checkCollisions();
+          }
+          if (this.renderer && this.scene && this.camera) {
+            try {
+              this.renderer.render(this.scene, this.camera);
+            } catch (renderError) {
+              console.error(
+                "AsteroidsGame: Error during rendering:",
+                renderError
+              );
+              this.isGameOver = true;
+              this.showMessage("A rendering error occurred.");
+            }
+          }
+        },
+      };
+
+      // ==================================================================
+      // Snake Game Object (Refactored)
+      // ==================================================================
+      const SnakeGame = {
+        // --- Constants ---
+        SEGMENT_SIZE: 1,
+        GRID_SIZE: 40,
+        HALF_GRID: 20,
+        HIGHLIGHT_OFFSET: 0.01,
+        INITIAL_SPEED: 200,
+        ORBIT_ANGLE_STEP: Math.PI / 60,
+        ORBIT_ZOOM_STEP: 0.95,
+        ORBIT_DOLLY_STEP: 1 / 0.95,
+        // Visual Params (depend on SEGMENT_SIZE)
+        SNAKE_RADIUS: 0.45, // SEGMENT_SIZE * 0.45
+        EYE_RADIUS: 0.09, // SNAKE_RADIUS * 0.2
+        EYE_COLOR: 0x000000,
+        HEAD_COLOR: 0x33dd33,
+        BODY_COLOR: 0x00aa00,
+        // Materials (created once)
+        SNAKE_MATERIAL: new THREE.MeshStandardMaterial({
+          color: 0x00aa00,
+          roughness: 0.5,
+          metalness: 0.1,
+        }),
+        HEAD_MATERIAL: new THREE.MeshStandardMaterial({
+          color: 0x33dd33,
+          roughness: 0.5,
+          metalness: 0.1,
+        }),
+        EYE_MATERIAL: new THREE.MeshStandardMaterial({
+          color: 0x000000,
+          roughness: 0.1,
+        }),
+
+        // --- State & Objects ---
+        scene: null,
+        camera: null,
+        renderer: null,
+        controls: null,
+        food: null,
+        snakePositions: [],
+        snakeMeshes: [],
+        headSegment: null,
+        snakeHeadHighlighter: null,
+        foodHighlighter: null,
+        direction: null,
+        nextDirection: null,
+        score: 0,
+        gameRunning: false,
+        gameLoopTimeoutId: null,
+        renderLoopId: null,
+        currentSpeed: 0,
+        initialCameraPosition: null,
+        isInitialized: false,
+
+        // --- UI Elements ---
+        gameContainer: null,
+        canvasElement: null,
+        scoreElement: null,
+        messageBox: null,
+        messageText: null,
+        restartButton: null,
+        topViewBtn: null,
+        frontViewBtn: null,
+        sideViewBtn: null,
+        resetViewBtn: null,
+        gameWrapper: null,
+
+        // --- Bound Functions ---
+        boundHandleKeyDown: null,
+        boundOnWindowResize: null,
+        boundAnimate: null,
+        boundGameLoop: null,
+        boundStartGame: null,
+        boundSetTopView: null,
+        boundSetFrontView: null,
+        boundSetSideView: null,
+        boundResetView: null,
+
+        init: function (wrapperId, canvasId) {
+          if (this.isInitialized) return true;
+          console.log("SnakeGame: Initializing...");
+          this.gameWrapper = document.getElementById(wrapperId);
+          if (!this.gameWrapper) {
+            console.error(
+              `SnakeGame: Wrapper element #${wrapperId} not found!`
+            );
+            return false;
+          }
+
+          // Find UI elements within the wrapper
+          this.gameContainer = this.gameWrapper.querySelector("#gameContainer"); // Using original inner ID
+          this.canvasElement = this.gameWrapper.querySelector("#" + canvasId);
+          this.scoreElement = this.gameWrapper.querySelector("#score"); // Needs unique ID or class if shared
+          this.messageBox = this.gameWrapper.querySelector("#messageBox");
+          this.messageText = this.gameWrapper.querySelector("#messageText");
+          this.restartButton = this.gameWrapper.querySelector("#restartButton");
+          this.topViewBtn = this.gameWrapper.querySelector("#topViewBtn");
+          this.frontViewBtn = this.gameWrapper.querySelector("#frontViewBtn");
+          this.sideViewBtn = this.gameWrapper.querySelector("#sideViewBtn");
+          this.resetViewBtn = this.gameWrapper.querySelector("#resetViewBtn");
+
+          if (
+            !this.gameContainer ||
+            !this.canvasElement ||
+            !this.scoreElement ||
+            !this.messageBox ||
+            !this.messageText ||
+            !this.restartButton ||
+            !this.topViewBtn ||
+            !this.frontViewBtn ||
+            !this.sideViewBtn ||
+            !this.resetViewBtn
+          ) {
+            console.error(
+              "SnakeGame: Failed to find all required UI elements."
+            );
+            return false;
+          }
+
+          // Bind 'this' context
+          this.boundHandleKeyDown = this.handleKeyDown.bind(this);
+          this.boundOnWindowResize = this.onWindowResize.bind(this);
+          this.boundAnimate = this.animate.bind(this);
+          this.boundGameLoop = this.gameLoop.bind(this);
+          // Bind button handlers
+          this.boundStartGame = this.startGame.bind(this); // For restart button
+          this.boundSetTopView = this.setTopView.bind(this);
+          this.boundSetFrontView = this.setFrontView.bind(this);
+          this.boundSetSideView = this.setSideView.bind(this);
+          this.boundResetView = this.resetView.bind(this);
+
+          try {
+            if (typeof THREE === "undefined")
+              throw new Error("THREE object not defined.");
+            this.scene = new THREE.Scene();
+            this.scene.background = new THREE.Color(0x1a1a1a);
+            this.direction = new THREE.Vector3(1, 0, 0); // Initialize vectors
+            this.nextDirection = new THREE.Vector3(1, 0, 0);
+            this.initialCameraPosition = new THREE.Vector3();
+            this.snakePositions = [];
+            this.snakeMeshes = []; // Initialize arrays
+
+            const aspect =
+              this.gameContainer.clientWidth / this.gameContainer.clientHeight;
+            this.camera = new THREE.PerspectiveCamera(75, aspect, 0.1, 1000);
+            this.initialCameraPosition.set(
+              0,
+              this.HALF_GRID * 1.4,
+              this.HALF_GRID * 1.6
+            );
+            this.camera.position.copy(this.initialCameraPosition);
+            this.camera.lookAt(this.scene.position);
+
+            this.renderer = new THREE.WebGLRenderer({
+              canvas: this.canvasElement,
+              antialias: true,
+            });
+            this.renderer.setSize(
+              this.gameContainer.clientWidth,
+              this.gameContainer.clientHeight
+            );
+            this.renderer.setPixelRatio(window.devicePixelRatio);
+
+            if (typeof THREE.OrbitControls !== "undefined") {
+              this.controls = new THREE.OrbitControls(
+                this.camera,
+                this.renderer.domElement
+              ); // Use renderer dom element
+              this.controls.enableDamping = true;
+              this.controls.dampingFactor = 0.1;
+              this.controls.screenSpacePanning = false;
+              this.controls.maxPolarAngle = Math.PI;
+              this.controls.minDistance = 3;
+              this.controls.maxDistance = this.GRID_SIZE * 2.5;
+              this.controls.target.set(0, 0, 0);
+              this.controls.update();
+            } else {
+              console.warn("SnakeGame: OrbitControls not loaded.");
+              this.controls = null;
+            }
+
+            this.setupSceneExtras(); // Add lights, grid, boundary
+            this.showMessage(
+              "Look: Mouse or I, J, K, L<br>" +
+                "Zoom: Wheel or + / -<br>" +
+                "Move: Arrows or WASD<br>" +
+                "Up/Down: Q / E<br><br>" +
+                "Use View Buttons Below<br>" +
+                "Press Move Key to Start",
+              false
+            );
+
+            this.isInitialized = true;
+            console.log("SnakeGame: Initialization complete.");
+            return true;
+          } catch (error) {
+            console.error("SnakeGame: Error during initialization:", error);
+            this.showMessage(`Initialization Error: ${error.message}`);
+            return false;
+          }
+        },
+
+        startGame: function () {
+          if (!this.isInitialized) {
+            console.error("SnakeGame: Not initialized.");
+            return;
+          }
+          console.log("SnakeGame: Starting game...");
+          this.gameRunning = true;
+          this.addListeners(); // Add listeners only when game starts
+
+          clearTimeout(this.gameLoopTimeoutId); // Clear any previous loop
+          this.clearSnakeMeshes();
+          this.snakePositions = [];
+          if (this.food) this.scene.remove(this.food);
+          this.food = null;
+          if (this.snakeHeadHighlighter)
+            this.snakeHeadHighlighter.visible = false;
+          if (this.foodHighlighter) this.foodHighlighter.visible = false;
+
+          this.score = 0;
+          this.currentSpeed = this.INITIAL_SPEED;
+          this.updateScore();
+          this.direction.set(1, 0, 0);
+          this.nextDirection.set(1, 0, 0);
+          this.hideMessage();
+
+          const startOffset = this.SEGMENT_SIZE * 0.5;
+          const margin = this.SEGMENT_SIZE * 1.5;
+          const headPosVec = new THREE.Vector3(
+            -this.HALF_GRID + margin,
+            startOffset,
+            -this.HALF_GRID + margin
+          );
+          const bodyPosVec = headPosVec
+            .clone()
+            .sub(this.direction.clone().multiplyScalar(this.SEGMENT_SIZE));
+          this.snakePositions.push(headPosVec);
+          this.snakePositions.push(bodyPosVec);
+
+          this.drawSnake();
+          this.createFood();
+
+          // Start loops
+          if (this.renderLoopId) cancelAnimationFrame(this.renderLoopId); // Ensure previous render loop is stopped
+          this.animate(); // Start render loop
+          this.gameLoop(); // Start game logic loop
+          this.canvasElement.focus(); // Focus canvas for keys
+          console.log("SnakeGame: Game loops started.");
+        },
+
+        stopGame: function () {
+          if (!this.gameRunning && !this.renderLoopId) return; // Already stopped
+          console.log("SnakeGame: Stopping game...");
+          this.gameRunning = false; // Stops game logic in gameLoop check
+          clearTimeout(this.gameLoopTimeoutId); // Stop game logic loop
+          this.gameLoopTimeoutId = null;
+          if (this.renderLoopId) {
+            // Stop render loop
+            cancelAnimationFrame(this.renderLoopId);
+            this.renderLoopId = null;
+          }
+          this.removeListeners();
+          console.log("SnakeGame: Game stopped.");
+        },
+
+        addListeners: function () {
+          if (this.canvasElement) {
+            this.canvasElement.addEventListener(
+              "keydown",
+              this.boundHandleKeyDown
+            );
+          }
+          window.addEventListener("resize", this.boundOnWindowResize);
+          if (this.restartButton)
+            this.restartButton.addEventListener("click", this.boundStartGame);
+          if (this.topViewBtn)
+            this.topViewBtn.addEventListener("click", this.boundSetTopView);
+          if (this.frontViewBtn)
+            this.frontViewBtn.addEventListener("click", this.boundSetFrontView);
+          if (this.sideViewBtn)
+            this.sideViewBtn.addEventListener("click", this.boundSetSideView);
+          if (this.resetViewBtn)
+            this.resetViewBtn.addEventListener("click", this.boundResetView);
+          console.log("SnakeGame: Listeners added.");
+        },
+
+        removeListeners: function () {
+          if (this.canvasElement) {
+            this.canvasElement.removeEventListener(
+              "keydown",
+              this.boundHandleKeyDown
+            );
+          }
+          window.removeEventListener("resize", this.boundOnWindowResize);
+          if (this.restartButton)
+            this.restartButton.removeEventListener(
+              "click",
+              this.boundStartGame
+            );
+          if (this.topViewBtn)
+            this.topViewBtn.removeEventListener("click", this.boundSetTopView);
+          if (this.frontViewBtn)
+            this.frontViewBtn.removeEventListener(
+              "click",
+              this.boundSetFrontView
+            );
+          if (this.sideViewBtn)
+            this.sideViewBtn.removeEventListener(
+              "click",
+              this.boundSetSideView
+            );
+          if (this.resetViewBtn)
+            this.resetViewBtn.removeEventListener("click", this.boundResetView);
+          console.log("SnakeGame: Listeners removed.");
+        },
+
+        setupSceneExtras: function () {
+          // Lighting
+          const ambientLight = new THREE.AmbientLight(0xcccccc, 0.8);
+          this.scene.add(ambientLight);
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+          directionalLight.position.set(
+            this.HALF_GRID * 0.8,
+            this.HALF_GRID * 2,
+            this.HALF_GRID * 1.2
+          );
+          this.scene.add(directionalLight);
+          // Boundary Box
+          const boundaryGeom = new THREE.BoxGeometry(
+            this.GRID_SIZE,
+            this.GRID_SIZE,
+            this.GRID_SIZE
+          );
+          const boundaryMat = new THREE.MeshBasicMaterial({
+            color: 0x00ffff,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.25,
+          });
+          const boundaryBox = new THREE.Mesh(boundaryGeom, boundaryMat);
+          boundaryBox.position.set(0, 0, 0);
+          this.scene.add(boundaryBox);
+          // Grid Helper
+          const gridHelper = new THREE.GridHelper(
+            this.GRID_SIZE,
+            this.GRID_SIZE,
+            0x444444,
+            0x888888
+          );
+          gridHelper.position.y = -this.HALF_GRID;
+          this.scene.add(gridHelper);
+          // Highlighters
+          const highlightGeom = new THREE.PlaneGeometry(
+            this.SEGMENT_SIZE,
+            this.SEGMENT_SIZE
+          );
+          highlightGeom.rotateX(-Math.PI / 2);
+          const headHighlightMat = new THREE.MeshBasicMaterial({
+            color: 0xffff00,
+            transparent: true,
+            opacity: 0.5,
+            side: THREE.DoubleSide,
+          });
+          this.snakeHeadHighlighter = new THREE.Mesh(
+            highlightGeom,
+            headHighlightMat
+          );
+          this.snakeHeadHighlighter.visible = false;
+          this.scene.add(this.snakeHeadHighlighter);
+          const foodHighlightMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.4,
+            side: THREE.DoubleSide,
+          });
+          this.foodHighlighter = new THREE.Mesh(
+            highlightGeom.clone(),
+            foodHighlightMat
+          );
+          this.foodHighlighter.visible = false;
+          this.scene.add(this.foodHighlighter);
+        },
+
+        gameLoop: function () {
+          if (!this.gameRunning) return;
+
+          if (!this.nextDirection.equals(this.direction.clone().negate())) {
+            this.direction.copy(this.nextDirection);
+          }
+
+          const currentHeadPos = this.snakePositions[0];
+          const newHeadPosition = currentHeadPos
+            .clone()
+            .addScaledVector(this.direction, this.SEGMENT_SIZE);
+
+          // Boundary Collision
+          if (
+            Math.abs(newHeadPosition.x) >= this.HALF_GRID ||
+            Math.abs(newHeadPosition.y) >= this.HALF_GRID ||
+            Math.abs(newHeadPosition.z) >= this.HALF_GRID
+          ) {
+            this.gameOver("Hit the wall!");
+            return;
+          }
+          // Self Collision
+          for (let i = 3; i < this.snakePositions.length; i++) {
+            if (
+              newHeadPosition.distanceTo(this.snakePositions[i]) <
+              this.SEGMENT_SIZE * 0.8
+            ) {
+              this.gameOver("Ate yourself!");
+              return;
+            }
+          }
+          // Food Collision
+          let ateFood = false;
+          if (
+            this.food &&
+            newHeadPosition.distanceTo(this.food.position) < this.SEGMENT_SIZE
+          ) {
+            ateFood = true;
+            this.score++;
+            this.updateScore();
+            this.scene.remove(this.food);
+            this.food = null;
+            this.foodHighlighter.visible = false;
+            this.createFood();
+            this.currentSpeed = Math.max(50, this.currentSpeed * 0.95);
+          }
+          // Update Snake Positions
+          this.snakePositions.unshift(newHeadPosition);
+          if (!ateFood) {
+            this.snakePositions.pop();
+          }
+          // Redraw Snake & Update Highlighters (Drawing happens in render loop now)
+          // this.drawSnake(); // Moved to render loop for smoothness
+          this.updateHighlighters();
+
+          this.gameLoopTimeoutId = setTimeout(
+            this.boundGameLoop,
+            this.currentSpeed
+          );
+        },
+
+        clearSnakeMeshes: function () {
+          /* ... (same as original, using this.scene etc) ... */
+          this.snakeMeshes.forEach((mesh) => {
+            if (mesh === this.headSegment && mesh.children.length > 0) {
+              [...mesh.children].forEach((child) => mesh.remove(child));
+            }
+            this.scene.remove(mesh);
+          });
+          this.snakeMeshes = [];
+          this.headSegment = null;
+        },
+        drawSnake: function () {
+          /* ... (same as original, using this.scene etc) ... */
+          this.clearSnakeMeshes();
+          if (this.snakePositions.length === 0) return;
+          const sphereGeometry = new THREE.SphereGeometry(
+            this.SNAKE_RADIUS,
+            16,
+            12
+          );
+          const cylinderGeometry = new THREE.CylinderGeometry(
+            this.SNAKE_RADIUS,
+            this.SNAKE_RADIUS,
+            1,
+            12
+          );
+          const eyeGeometry = new THREE.SphereGeometry(this.EYE_RADIUS, 8, 6);
+          for (let i = 0; i < this.snakePositions.length; i++) {
+            const pos = this.snakePositions[i];
+            const isHead = i === 0;
+            const sphereMaterial = isHead
+              ? this.HEAD_MATERIAL
+              : this.SNAKE_MATERIAL;
+            const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+            sphere.position.copy(pos);
+            this.scene.add(sphere);
+            this.snakeMeshes.push(sphere);
+            if (isHead) {
+              this.headSegment = sphere;
+              const eyeY = this.SNAKE_RADIUS * 0.3;
+              const eyeZ = this.SNAKE_RADIUS * 0.8;
+              const eyeX = this.SNAKE_RADIUS * 0.6;
+              const eyeL = new THREE.Mesh(eyeGeometry, this.EYE_MATERIAL);
+              eyeL.position.set(eyeX, eyeY, eyeZ);
+              this.headSegment.add(eyeL);
+              const eyeR = new THREE.Mesh(eyeGeometry, this.EYE_MATERIAL);
+              eyeR.position.set(-eyeX, eyeY, eyeZ);
+              this.headSegment.add(eyeR);
+              const lookTarget = pos.clone().add(this.direction);
+              this.headSegment.lookAt(lookTarget);
+            }
+            if (i < this.snakePositions.length - 1) {
+              const nextPos = this.snakePositions[i + 1];
+              const distance = pos.distanceTo(nextPos);
+              const cylinder = new THREE.Mesh(
+                cylinderGeometry,
+                this.SNAKE_MATERIAL
+              );
+              cylinder.scale.y = distance;
+              cylinder.position.lerpVectors(pos, nextPos, 0.5);
+              cylinder.lookAt(nextPos);
+              cylinder.rotateX(Math.PI / 2);
+              this.scene.add(cylinder);
+              this.snakeMeshes.push(cylinder);
+            }
+          }
+        },
+        createFood: function () {
+          /* ... (same as original, using this.scene etc) ... */
+          const geometry = new THREE.SphereGeometry(
+            this.SEGMENT_SIZE / 2,
+            16,
+            16
+          );
+          const material = new THREE.MeshStandardMaterial({
+            color: 0xff3333,
+            emissive: 0x550000,
+            roughness: 0.4,
+            metalness: 0.1,
+          });
+          this.food = new THREE.Mesh(geometry, material);
+          let foodPosition;
+          let positionOccupied;
+          const maxAttempts = this.GRID_SIZE * this.GRID_SIZE * this.GRID_SIZE;
+          let attempts = 0;
+          do {
+            positionOccupied = false;
+            const range = this.GRID_SIZE - 2;
+            const minVal = -this.HALF_GRID + 1;
+            const x = Math.floor(Math.random() * range) + minVal;
+            const y = Math.floor(Math.random() * range) + minVal;
+            const z = Math.floor(Math.random() * range) + minVal;
+            foodPosition = new THREE.Vector3(
+              x + 0.5,
+              y + 0.5,
+              z + 0.5
+            ).multiplyScalar(this.SEGMENT_SIZE);
+            for (const segmentPos of this.snakePositions) {
+              if (
+                foodPosition.distanceTo(segmentPos) <
+                this.SEGMENT_SIZE * 0.5
+              ) {
+                positionOccupied = true;
+                break;
+              }
+            }
+            attempts++;
+          } while (positionOccupied && attempts < maxAttempts);
+          if (attempts >= maxAttempts) {
+            console.warn("SnakeGame: Could not find empty spot for food!");
+            return;
+          }
+          this.food.position.copy(foodPosition);
+          this.scene.add(this.food);
+          this.updateHighlighters();
+        },
+        updateHighlighters: function () {
+          /* ... (same as original, using this.scene etc) ... */
+          if (this.snakePositions.length > 0) {
+            const headPos = this.snakePositions[0];
+            this.snakeHeadHighlighter.position.set(
+              headPos.x,
+              -this.HALF_GRID + this.HIGHLIGHT_OFFSET,
+              headPos.z
+            );
+            this.snakeHeadHighlighter.visible = true;
+          } else {
+            this.snakeHeadHighlighter.visible = false;
+          }
+          if (this.food) {
+            const foodPos = this.food.position;
+            this.foodHighlighter.position.set(
+              foodPos.x,
+              -this.HALF_GRID + this.HIGHLIGHT_OFFSET,
+              foodPos.z
+            );
+            this.foodHighlighter.visible = true;
+          } else {
+            this.foodHighlighter.visible = false;
+          }
+        },
+        gameOver: function (reason) {
+          /* ... (same as original, using this.) ... */
+          this.gameRunning = false;
+          clearTimeout(this.gameLoopTimeoutId);
+          this.snakeHeadHighlighter.visible = false;
+          this.showMessage(
+            `Game Over! ${reason}<br>Final Score: ${this.score}`
+          );
+        },
+        updateScore: function () {
+          /* ... (same as original, using this.) ... */
+          if (this.scoreElement)
+            this.scoreElement.textContent = `Score: ${this.score}`;
+        },
+        showMessage: function (message, showButton = true) {
+          /* ... (same as original, using this.) ... */
+          if (!this.messageBox || !this.messageText || !this.restartButton)
+            return;
+          this.messageText.innerHTML = message;
+          this.restartButton.style.display = showButton
+            ? "inline-block"
+            : "none";
+          this.messageBox.style.display = "block";
+        },
+        hideMessage: function () {
+          /* ... (same as original, using this.) ... */
+          if (!this.messageBox) return;
+          this.messageBox.style.display = "none";
+          if (!this.gameRunning && this.controls) this.controls.enabled = true;
+        },
+        setCameraView: function (x, y, z, upX = 0, upY = 1, upZ = 0) {
+          /* ... (same as original, using this.) ... */
+          if (!this.camera || !this.controls) return;
+          this.camera.position.set(x, y, z);
+          this.camera.up.set(upX, upY, upZ);
+          this.camera.lookAt(this.controls.target);
+          this.controls.update();
+        },
+        setTopView: function () {
+          this.setCameraView(0, this.GRID_SIZE * 1.5, 0, 0, 0, -1);
+        },
+        setFrontView: function () {
+          this.setCameraView(0, 0, this.GRID_SIZE * 1.5, 0, 1, 0);
+        },
+        setSideView: function () {
+          this.setCameraView(this.GRID_SIZE * 1.5, 0, 0, 0, 1, 0);
+        },
+        resetView: function () {
+          this.setCameraView(
+            this.initialCameraPosition.x,
+            this.initialCameraPosition.y,
+            this.initialCameraPosition.z,
+            0,
+            1,
+            0
+          );
+        },
+
+        handleKeyDown: function (event) {
+          /* ... (mostly same as original, using this.) ... */
+          const movementKeys = [
+            "ArrowUp",
+            "ArrowDown",
+            "ArrowLeft",
+            "ArrowRight",
+            "KeyW",
+            "KeyS",
+            "KeyA",
+            "KeyD",
+            "KeyQ",
+            "KeyE",
+            "PageUp",
+            "PageDown",
+          ];
+          const orbitKeys = [
+            "KeyI",
+            "KeyJ",
+            "KeyK",
+            "KeyL",
+            "Minus",
+            "Equal",
+            "NumpadSubtract",
+            "NumpadAdd",
+          ];
+          if (
+            movementKeys.includes(event.code) ||
+            orbitKeys.includes(event.code)
+          ) {
+            event.preventDefault();
+          }
+          let orbitChanged = false;
+          if (this.controls) {
+            switch (event.code) {
+              case "KeyI":
+                this.controls.rotateUp(this.ORBIT_ANGLE_STEP);
+                orbitChanged = true;
+                break;
+              case "KeyK":
+                this.controls.rotateUp(-this.ORBIT_ANGLE_STEP);
+                orbitChanged = true;
+                break;
+              case "KeyJ":
+                this.controls.rotateLeft(this.ORBIT_ANGLE_STEP);
+                orbitChanged = true;
+                break;
+              case "KeyL":
+                this.controls.rotateLeft(-this.ORBIT_ANGLE_STEP);
+                orbitChanged = true;
+                break;
+              case "Minus":
+              case "NumpadSubtract":
+                this.controls.dollyOut(this.ORBIT_DOLLY_STEP);
+                orbitChanged = true;
+                break;
+              case "Equal":
+              case "NumpadAdd":
+                this.controls.dollyIn(this.ORBIT_DOLLY_STEP);
+                orbitChanged = true;
+                break;
+            }
+            if (orbitChanged && this.messageBox.style.display === "none") {
+              this.controls.update();
+            }
+          }
+          if (!this.gameRunning && movementKeys.includes(event.code)) {
+            if (
+              (this.messageBox.style.display === "block" &&
+                !this.restartButton.style.display) ||
+              this.restartButton.style.display === "none"
+            ) {
+              this.startGame();
+            } else if (
+              !this.gameRunning &&
+              this.messageBox.style.display !== "block"
+            ) {
+              this.startGame();
+            }
+            return;
+          }
+          if (!this.gameRunning) return;
+          const tempDirection = new THREE.Vector3();
+          let directionChanged = false;
+          switch (event.code) {
+            case "ArrowUp":
+            case "KeyW":
+              tempDirection.set(0, 0, -1);
+              directionChanged = true;
+              break;
+            case "ArrowDown":
+            case "KeyS":
+              tempDirection.set(0, 0, 1);
+              directionChanged = true;
+              break;
+            case "ArrowLeft":
+            case "KeyA":
+              tempDirection.set(-1, 0, 0);
+              directionChanged = true;
+              break;
+            case "ArrowRight":
+            case "KeyD":
+              tempDirection.set(1, 0, 0);
+              directionChanged = true;
+              break;
+            case "PageUp":
+            case "KeyQ":
+              tempDirection.set(0, 1, 0);
+              directionChanged = true;
+              break;
+            case "PageDown":
+            case "KeyE":
+              tempDirection.set(0, -1, 0);
+              directionChanged = true;
+              break;
+          }
+          if (
+            directionChanged &&
+            !tempDirection.equals(this.direction.clone().negate())
+          ) {
+            this.nextDirection.copy(tempDirection);
+          }
+        },
+        onWindowResize: function () {
+          /* ... (same as original, using this.) ... */
+          if (!this.camera || !this.renderer || !this.gameContainer) return;
+          const width = this.gameContainer.clientWidth;
+          const height = this.gameContainer.clientHeight;
+          if (width <= 0 || height <= 0) return;
+          this.camera.aspect = width / height;
+          this.camera.updateProjectionMatrix();
+          this.renderer.setSize(width, height);
+        },
+
+        animate: function () {
+          // Render loop
+          this.renderLoopId = requestAnimationFrame(this.boundAnimate);
+          if (this.controls && this.controls.enabled) {
+            this.controls.update();
+          }
+          // Draw snake in render loop for smoother animation
+          if (this.gameRunning) {
+            this.drawSnake();
+          }
+          if (this.renderer && this.scene && this.camera) {
+            this.renderer.render(this.scene, this.camera);
+          }
+        },
+      };
+
+      // ==================================================================
+      // Menu and Game Management Logic
+      // ==================================================================
+      document.addEventListener("DOMContentLoaded", () => {
+        const menuScreen = document.getElementById("menu-screen");
+        const asteroidsWrapper = document.getElementById(
+          "asteroids-game-wrapper"
+        );
+        const snakeWrapper = document.getElementById("snake-game-wrapper");
+        const startAsteroidsBtn = document.getElementById("start-asteroids");
+        const startSnakeBtn = document.getElementById("start-snake");
+        const backToMenuBtns = document.querySelectorAll(".back-to-menu-btn");
+
+        let activeGame = null; // Keep track of the currently active game object
+
+        function showMenu() {
+          menuScreen.classList.remove("hidden");
+          asteroidsWrapper.classList.add("hidden");
+          snakeWrapper.classList.add("hidden");
+          if (activeGame && typeof activeGame.stopGame === "function") {
+            activeGame.stopGame();
+          }
+          activeGame = null;
+          console.log("Returned to menu.");
         }
 
-        // Snake Movement
-        if (!gameRunning) return;
-        const tempDirection = new THREE.Vector3();
-        let directionChanged = false;
-        switch (event.code) {
-          case "ArrowUp":
-          case "KeyW":
-            tempDirection.set(0, 0, -1);
-            directionChanged = true;
-            break;
-          case "ArrowDown":
-          case "KeyS":
-            tempDirection.set(0, 0, 1);
-            directionChanged = true;
-            break;
-          case "ArrowLeft":
-          case "KeyA":
-            tempDirection.set(-1, 0, 0);
-            directionChanged = true;
-            break;
-          case "ArrowRight":
-          case "KeyD":
-            tempDirection.set(1, 0, 0);
-            directionChanged = true;
-            break;
-          case "PageUp":
-          case "KeyQ":
-            tempDirection.set(0, 1, 0);
-            directionChanged = true;
-            break;
-          case "PageDown":
-          case "KeyE":
-            tempDirection.set(0, -1, 0);
-            directionChanged = true;
-            break;
-        }
-        if (
-          directionChanged &&
-          !tempDirection.equals(direction.clone().negate())
-        ) {
-          nextDirection.copy(tempDirection);
-        }
-      }
-      function onWindowResize() {
-        const width = gameContainer.clientWidth;
-        const height = gameContainer.clientHeight;
-        camera.aspect = width / height;
-        camera.updateProjectionMatrix();
-        renderer.setSize(width, height);
-      }
+        startAsteroidsBtn.addEventListener("click", () => {
+          console.log("Start Asteroids clicked");
+          if (activeGame && typeof activeGame.stopGame === "function")
+            activeGame.stopGame(); // Stop previous game
+          menuScreen.classList.add("hidden");
+          snakeWrapper.classList.add("hidden");
+          asteroidsWrapper.classList.remove("hidden");
 
-      // --- Animation Loop ---
-      function animate() {
-        requestAnimationFrame(animate);
-        if (controls.enabled) {
-          controls.update();
-        }
-        renderer.render(scene, camera);
-      }
+          if (!AsteroidsGame.isInitialized) {
+            if (
+              !AsteroidsGame.init("asteroids-game-wrapper", "asteroids-canvas")
+            ) {
+              showMenu(); // Go back to menu if init fails
+              alert("Failed to initialize Asteroids game!");
+              return;
+            }
+          }
+          AsteroidsGame.startGame();
+          activeGame = AsteroidsGame;
+        });
 
-      // Ensure init runs after DOM is loaded
-      window.onload = init;
+        startSnakeBtn.addEventListener("click", () => {
+          console.log("Start Snake clicked");
+          if (activeGame && typeof activeGame.stopGame === "function")
+            activeGame.stopGame(); // Stop previous game
+          menuScreen.classList.add("hidden");
+          asteroidsWrapper.classList.add("hidden");
+          snakeWrapper.classList.remove("hidden");
+
+          if (!SnakeGame.isInitialized) {
+            if (!SnakeGame.init("snake-game-wrapper", "snake-canvas")) {
+              showMenu(); // Go back to menu if init fails
+              alert("Failed to initialize Snake game!");
+              return;
+            }
+          }
+          SnakeGame.startGame();
+          activeGame = SnakeGame;
+        });
+
+        // Add listeners for "Back to Menu" buttons
+        backToMenuBtns.forEach((btn) => {
+          btn.addEventListener("click", showMenu);
+        });
+      });
     </script>
   </body>
 </html>
