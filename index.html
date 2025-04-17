@@ -23,6 +23,7 @@
         padding-top: 30px; /* More space for menu */
         min-height: 100vh;
         box-sizing: border-box;
+        overflow-x: hidden; /* Prevent horizontal scroll */
       }
 
       button {
@@ -31,9 +32,11 @@
         cursor: pointer;
         border-radius: 5px;
         transition: all 0.2s ease;
+        text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
       }
       button:active {
         transform: translateY(1px);
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.3);
       }
 
       /* --- Menu Styles --- */
@@ -58,18 +61,18 @@
         background-color: #333;
         color: #0f0;
         border: 2px solid #0f0;
-        box-shadow: 0 0 10px #0f0;
+        box-shadow: 0 0 10px #0f0, 0 2px 5px rgba(0, 0, 0, 0.4);
       }
       #menu-screen button:hover {
         background-color: #0f0;
         color: #000;
-        box-shadow: 0 0 15px #0f0, 0 0 25px #0f0;
+        box-shadow: 0 0 15px #0f0, 0 0 25px #0f0, 0 2px 5px rgba(0, 0, 0, 0.4);
       }
 
       /* --- Game Wrapper Styles --- */
       .game-wrapper {
         width: 95vw;
-        max-width: 1000px;
+        max-width: 1000px; /* Consistent max width */
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -81,28 +84,32 @@
         display: none !important;
       }
 
-      /* --- Asteroids Specific Styles --- */
-      #asteroids-game-wrapper #game-container {
+      /* --- General Game Container Styles --- */
+      .game-container {
         position: relative;
         width: 100%;
-        aspect-ratio: 1000 / 750;
-        max-height: 75vh;
+        aspect-ratio: 1000 / 750; /* Maintain aspect ratio */
+        max-height: 75vh; /* Limit height */
         border: 2px solid #0f0;
         box-shadow: 0 0 15px #0f0;
         margin-bottom: 15px;
+        background-color: #000; /* Black background for games */
+        overflow: hidden; /* Hide anything overflowing */
       }
-      #asteroids-game-wrapper canvas#asteroids-canvas {
-        /* Specific ID */
+
+      .game-container canvas {
         display: block;
         width: 100%;
         height: 100%;
-        cursor: grab;
-        outline: none;
+        outline: none; /* Remove focus outline */
+        cursor: grab; /* Indicate draggable */
       }
-      #asteroids-game-wrapper canvas#asteroids-canvas:active {
+      .game-container canvas:active {
         cursor: grabbing;
       }
-      #asteroids-game-wrapper #ui-container {
+
+      /* --- General UI Container Styles --- */
+      .ui-container {
         position: absolute;
         top: 10px;
         left: 10px;
@@ -114,28 +121,33 @@
         pointer-events: none;
         text-shadow: 0 0 5px #0f0;
         padding: 0 10px;
-        flex-wrap: wrap;
+        flex-wrap: wrap; /* Wrap UI elements if needed */
+        z-index: 10; /* Ensure UI is above canvas */
       }
-      #asteroids-game-wrapper #score {
+      .ui-container span {
+        margin-right: 15px;
+      }
+      .ui-container .score {
         color: #0f0;
-        margin-right: 15px;
       }
-      #asteroids-game-wrapper #level {
+      .ui-container .level {
         color: #fff;
-        margin-right: 15px;
         text-shadow: 0 0 5px #fff;
       }
-      #asteroids-game-wrapper #lives {
+      .ui-container .lives {
         color: #f00;
+        text-shadow: 0 0 5px #f00;
       }
-      #asteroids-game-wrapper #message-box {
+
+      /* --- General Message Box Styles --- */
+      .message-box {
         position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        background-color: rgba(0, 0, 0, 0.7);
+        background-color: rgba(0, 0, 0, 0.8);
         color: #fff;
-        padding: 20px;
+        padding: 20px 30px;
         border-radius: 10px;
         text-align: center;
         font-size: 24px;
@@ -143,35 +155,80 @@
         border: 1px solid #0f0;
         text-shadow: 0 0 8px #0f0;
         pointer-events: none;
+        z-index: 20;
+        line-height: 1.5;
       }
-      #asteroids-game-wrapper #controls-container {
+      .message-box button {
+        /* Style for buttons inside message boxes */
+        font-size: 0.8em;
+        padding: 10px 20px;
+        margin-top: 15px;
+        background-color: #333;
+        color: #0f0;
+        border: 1px solid #0f0;
+        box-shadow: 0 0 8px #0f0;
+        pointer-events: auto; /* Allow clicking */
+      }
+      .message-box button:hover {
+        background-color: #0f0;
+        color: #000;
+      }
+
+      /* --- General Controls Info Styles --- */
+      .controls-container {
         margin-top: 0;
         text-align: center;
       }
-      #asteroids-game-wrapper #controls-info {
+      .controls-info {
         font-size: 12px;
         color: #aaa;
         line-height: 1.5;
+        margin-bottom: 5px;
       }
-      #asteroids-game-wrapper #controls-info span {
+      .controls-info span {
         color: #fff;
         background-color: #333;
         padding: 2px 5px;
         border-radius: 3px;
         margin: 0 3px;
+        display: inline-block; /* Prevent wrapping inside span */
       }
-      #asteroids-game-wrapper #camera-controls-info {
+      .camera-controls-info {
         margin-top: 5px;
         font-size: 10px;
         color: #888;
         line-height: 1.5;
       }
-      #asteroids-game-wrapper #camera-controls-info span {
+
+      /* --- Back to Menu Button --- */
+      .back-to-menu-btn {
+        margin-top: 20px;
+        padding: 8px 15px;
+        font-size: 0.8em;
+        background-color: #555;
+        color: #ccc;
+        border: 1px solid #888;
+      }
+      .back-to-menu-btn:hover {
+        background-color: #777;
         color: #fff;
-        background-color: #333;
-        padding: 2px 5px;
-        border-radius: 3px;
-        margin: 0 3px;
+      }
+
+      /* --- Asteroids Specific Styles --- */
+      #asteroids-game-wrapper .game-container {
+        /* Use general style */
+      }
+      #asteroids-game-wrapper canvas#asteroids-canvas {
+        /* Use general style */
+      }
+      #asteroids-game-wrapper .ui-container {
+        /* Use general style */
+      }
+      #asteroids-game-wrapper .message-box {
+        /* Use general style */
+      }
+      #asteroids-game-wrapper .controls-container {
+        /* Use general style */
       }
       #asteroids-game-wrapper #view-toggle-container {
         text-align: center;
@@ -194,68 +251,38 @@
       }
 
       /* --- Snake Specific Styles --- */
-      #snake-game-wrapper #gameContainer {
-        /* Use original ID within wrapper */
-        position: relative;
-        width: 85vmin;
-        height: 85vmin;
-        max-width: 800px;
-        max-height: 800px;
-        border: 2px solid #555;
+      #snake-game-wrapper .game-container {
+        /* Use general style, override aspect ratio if needed */
+        aspect-ratio: 1 / 1; /* Snake is often square */
+        max-width: 800px; /* Adjust max width if needed */
+        max-height: 80vh;
+        border-color: #555; /* Different border color */
         box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-        cursor: grab;
-        margin-bottom: 15px;
-      }
-      #snake-game-wrapper #gameContainer:active {
-        cursor: grabbing;
       }
       #snake-game-wrapper canvas#snake-canvas {
-        /* Specific ID */
-        display: block;
-        width: 100%;
-        height: 100%;
+        /* Use general style */
       }
-      #snake-game-wrapper #uiContainer {
-        position: absolute;
-        top: 10px;
-        left: 10px;
-        right: 10px;
-        display: flex;
-        justify-content: space-between;
-        font-size: 1.5em;
-        text-shadow: 2px 2px 4px #000;
-        pointer-events: none;
-        z-index: 10;
+      #snake-game-wrapper .ui-container {
+        /* Use general style */
       }
-      #snake-game-wrapper #uiContainer #score {
-        /* Be specific */
-        color: #fff; /* White score for snake */
+      #snake-game-wrapper .ui-container .score {
+        color: #fff;
         text-shadow: 0 0 5px #fff;
-      }
-      #snake-game-wrapper #messageBox {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        background-color: rgba(0, 0, 0, 0.8);
-        padding: 30px;
-        border-radius: 15px;
-        text-align: center;
-        font-size: 1.2em;
-        display: none;
-        z-index: 20;
-        border: 2px solid #fff;
+      } /* White score */
+      #snake-game-wrapper .message-box {
+        /* Use general style */
+        border-color: #fff;
         box-shadow: 0 0 15px rgba(255, 255, 255, 0.7);
       }
-      #snake-game-wrapper #messageText {
-        margin-bottom: 20px;
-      }
       #snake-game-wrapper #controlsContainer {
+        /* Different layout for snake controls */
         display: flex;
         gap: 10px;
-      } /* Use original ID within wrapper */
-      #snake-game-wrapper button {
-        /* General button style for snake controls */
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+      #snake-game-wrapper #controlsContainer button {
+        /* Specific button style for snake views */
         padding: 10px 15px;
         font-size: 0.7em;
         background: linear-gradient(145deg, #444, #222);
@@ -267,36 +294,42 @@
           inset 2px 2px 3px rgba(255, 255, 255, 0.1);
         pointer-events: auto;
       }
-      #snake-game-wrapper button#restartButton {
-        margin-top: 15px;
-        font-size: 0.8em;
-        padding: 10px 20px;
-      }
-      #snake-game-wrapper button:hover {
+      #snake-game-wrapper #controlsContainer button:hover {
         background: linear-gradient(145deg, #555, #333);
         box-shadow: 4px 4px 7px rgba(0, 0, 0, 0.6),
           inset -2px -2px 3px rgba(0, 0, 0, 0.3),
           inset 2px 2px 3px rgba(255, 255, 255, 0.1);
         transform: translateY(-1px);
       }
-      #snake-game-wrapper button:active {
+      #snake-game-wrapper #controlsContainer button:active {
         transform: translateY(1px);
         box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5),
           inset -2px -2px 3px rgba(0, 0, 0, 0.3),
           inset 2px 2px 3px rgba(255, 255, 255, 0.1);
       }
-      /* Back to Menu Button */
-      .back-to-menu-btn {
-        margin-top: 20px;
-        padding: 8px 15px;
-        font-size: 0.8em;
-        background-color: #555;
-        color: #ccc;
-        border: 1px solid #888;
+
+      /* --- Space Invaders Specific Styles --- */
+      #space-invaders-game-wrapper .game-container {
+        /* Use general style, maybe adjust aspect ratio if needed */
+        /* aspect-ratio: 4 / 3; */
       }
-      .back-to-menu-btn:hover {
-        background-color: #777;
-        color: #fff;
+      #space-invaders-game-wrapper canvas#space-invaders-canvas {
+        /* Use general style */
+      }
+      #space-invaders-game-wrapper .ui-container {
+        /* Use general style */
+      }
+      #space-invaders-game-wrapper .message-box {
+        /* Use general style */
+      }
+      #space-invaders-game-wrapper .controls-container {
+        /* Use general style */
+      }
+      /* Add any specific styles for Space Invaders elements if needed */
+      #space-invaders-game-wrapper .controls-info span {
+        min-width: 40px; /* Adjust width for keys */
+        text-align: center;
+        margin: 0 1px; /* Slightly reduce margin */
       }
     </style>
   </head>
@@ -305,38 +338,34 @@
       <h1>3D Arcade</h1>
       <button id="start-asteroids">Play Asteroids</button>
       <button id="start-snake">Play 3D Snake</button>
+      <button id="start-space-invaders">Play Space Invaders</button>
     </div>
 
     <div id="asteroids-game-wrapper" class="game-wrapper hidden">
       <div id="view-toggle-container">
         <button id="toggle-view-btn">Toggle POV</button>
       </div>
-      <div id="game-container">
-        <div id="ui-container">
+      <div class="game-container">
+        <div class="ui-container">
           <div>
-            <span id="score">Score: 0</span>
-            <span id="level">Level: 1</span>
+            <span class="score" id="asteroids-score">Score: 0</span>
+            <span class="level" id="asteroids-level">Level: 1</span>
           </div>
-          <div id="lives">Lives: 3</div>
+          <div class="lives" id="asteroids-lives">Lives: 3</div>
         </div>
-        <div id="message-box">Game Over!</div>
+        <div class="message-box" id="asteroids-message-box">Game Over!</div>
         <canvas id="asteroids-canvas" tabindex="0"></canvas>
       </div>
-      <div id="controls-container">
-        <div id="controls-info">
-          Ship: <span>&larr;</span>/<span>&rarr;</span> Rotate Left/Right |
-          <span>W</span>/<span>S</span> Pitch Up/Down |
-          <span>&uarr;</span> Thrust | <span>Space</span> Fire |
-          <span>Enter</span> Restart
+      <div class="controls-container">
+        <div class="controls-info">
+          Ship: <span>&larr;</span>/<span>&rarr;</span> Rotate |
+          <span>W</span>/<span>S</span> Pitch | <span>&uarr;</span> Thrust |
+          <span>Space</span> Fire | <span>Enter</span> Restart
         </div>
-        <div id="camera-controls-info">
-          Camera: Drag L-Mouse = Orbit | Drag R-Mouse = Pan | Scroll = Zoom
-          <br />
-          Keys: <span>I</span>/<span>K</span> Pan Up/Down | <span>J</span>/<span
-            >L</span
-          >
-          Pan Left/Right | <span>U</span>/<span>O</span> Zoom Out/In
-          <br />(Click game area to enable keyboard controls)
+        <div class="camera-controls-info">
+          Camera: Drag L-Mouse = Orbit | Drag R-Mouse = Pan | Scroll = Zoom |
+          Keys: <span>IJKL</span> Pan | <span>UO</span> Zoom <br />(Click game
+          area to enable keyboard controls)
         </div>
       </div>
       <button class="back-to-menu-btn" data-game="asteroids">
@@ -345,13 +374,13 @@
     </div>
 
     <div id="snake-game-wrapper" class="game-wrapper hidden">
-      <div id="gameContainer">
-        <div id="uiContainer">
-          <div id="score">Score: 0</div>
+      <div class="game-container" id="snake-gameContainer">
+        <div class="ui-container">
+          <span class="score" id="snake-score">Score: 0</span>
         </div>
-        <div id="messageBox">
-          <div id="messageText">Game Over!</div>
-          <button id="restartButton">Restart</button>
+        <div class="message-box" id="snake-messageBox">
+          <div id="snake-messageText">Game Over!</div>
+          <button id="snake-restartButton">Restart</button>
         </div>
         <canvas id="snake-canvas" tabindex="0"></canvas>
       </div>
@@ -361,12 +390,50 @@
         <button id="sideViewBtn">Side</button>
         <button id="resetViewBtn">Reset</button>
       </div>
+      <div class="controls-container">
+        <div class="controls-info">
+          Move: <span>&larr;</span><span>&uarr;</span><span>&darr;</span
+          ><span>&rarr;</span> or <span>WASD</span> | Up/Down:
+          <span>Q</span>/<span>E</span>
+        </div>
+        <div class="camera-controls-info">
+          Camera: Drag L-Mouse = Orbit | Scroll = Zoom | Keys:
+          <span>IJKL</span> Orbit | <span>+/-</span> Zoom
+        </div>
+      </div>
       <button class="back-to-menu-btn" data-game="snake">Back to Menu</button>
+    </div>
+
+    <div id="space-invaders-game-wrapper" class="game-wrapper hidden">
+      <div class="game-container">
+        <div class="ui-container">
+          <div>
+            <span class="score" id="invaders-score">Score: 0</span>
+            <span class="level" id="invaders-level">Level: 1</span>
+          </div>
+          <div class="lives" id="invaders-lives">Lives: 3</div>
+        </div>
+        <div class="message-box" id="invaders-message-box">Get Ready!</div>
+        <canvas id="space-invaders-canvas" tabindex="0"></canvas>
+      </div>
+      <div class="controls-container">
+        <div class="controls-info">
+          Move: <span>&larr;</span><span>&uarr;</span><span>&darr;</span
+          ><span>&rarr;</span> or <span>WASD</span> | Fire: <span>Space</span> |
+          Restart: <span>Enter</span>
+        </div>
+        <div class="camera-controls-info">
+          Camera: Drag L-Mouse = Orbit | Scroll = Zoom
+        </div>
+      </div>
+      <button class="back-to-menu-btn" data-game="space-invaders">
+        Back to Menu
+      </button>
     </div>
 
     <script>
       // ==================================================================
-      // Asteroids Game Object (Refactored)
+      // Asteroids Game Object (Refactored - Use unique UI IDs)
       // ==================================================================
       const AsteroidsGame = {
         // --- Config Constants ---
@@ -382,7 +449,7 @@
         SHIP_THRUST: 0.001,
         SHIP_MAX_SPEED: 0.1,
         SHIP_DRAG: 0.99,
-        BULLET_SPEED: 0.3,
+        BULLET_SPEED: 0.3, // Restored full name
         BULLET_LIFESPAN: 60,
         SAFE_ZONE_RADIUS: 10,
         MAX_SPAWN_RADIUS: 30,
@@ -427,7 +494,7 @@
         boundAnimate: null,
 
         init: function (wrapperId, canvasId) {
-          if (this.isInitialized) return true; // Prevent re-initialization
+          if (this.isInitialized) return true;
           console.log("AsteroidsGame: Initializing...");
           this.gameWrapper = document.getElementById(wrapperId);
           if (!this.gameWrapper) {
@@ -436,15 +503,21 @@
             );
             return false;
           }
+
+          // Use unique IDs for UI elements
           this.canvasElement = this.gameWrapper.querySelector("#" + canvasId);
-          // ... (find other UI elements within wrapper) ...
-          this.messageBox = this.gameWrapper.querySelector("#message-box");
-          this.scoreElement = this.gameWrapper.querySelector("#score");
-          this.livesElement = this.gameWrapper.querySelector("#lives");
-          this.levelElement = this.gameWrapper.querySelector("#level");
+          this.messageBox = this.gameWrapper.querySelector(
+            "#asteroids-message-box"
+          );
+          this.scoreElement =
+            this.gameWrapper.querySelector("#asteroids-score");
+          this.livesElement =
+            this.gameWrapper.querySelector("#asteroids-lives");
+          this.levelElement =
+            this.gameWrapper.querySelector("#asteroids-level");
           this.toggleBtn = this.gameWrapper.querySelector("#toggle-view-btn");
           this.gameContainer =
-            this.gameWrapper.querySelector("#game-container");
+            this.gameWrapper.querySelector(".game-container"); // Use class
 
           if (
             !this.canvasElement ||
@@ -529,7 +602,6 @@
           this.isRunning = true;
           this.addListeners(); // Add listeners only when game starts
           this.resetGame(); // Resets level, score, lives, objects, camera
-          this.animationLoopRunning = false;
           if (this.animationFrameId)
             cancelAnimationFrame(this.animationFrameId);
           this.animate();
@@ -583,7 +655,7 @@
           }
           console.log("AsteroidsGame: Listeners removed.");
         },
-        // --- (Rest of AsteroidsGame methods: setupSceneExtras, setCameraMode, createShip, createAsteroids, createAsteroid, updateShip, updateAsteroids, updateBullets, handleCameraKeyboardInput, wrapAroundScreen, checkCollisions, splitAsteroid, handlePlayerHit, resetShipPosition, gameOver, resetGame, updateUI, showMessage, handleKeyDown, handleKeyUp, onWindowResize, animate - kept mostly the same as previous version, ensuring 'this' is used correctly) ---
+        // --- (Rest of AsteroidsGame methods: setupSceneExtras, setCameraMode, createShip, createAsteroids, createAsteroid, updateShip, updateAsteroids, updateBullets, handleCameraKeyboardInput, wrapAroundScreen, checkCollisions, splitAsteroid, handlePlayerHit, resetShipPosition, gameOver, resetGame, updateUI, showMessage, handleKeyDown, handleKeyUp, onWindowResize, animate - kept mostly the same as previous version, ensuring 'this' is used correctly and UI elements are referenced correctly) ---
         setupSceneExtras: function () {
           const ambientLight = new THREE.AmbientLight(0x505050);
           this.scene.add(ambientLight);
@@ -619,7 +691,6 @@
           this.scene.add(this.shipShadow);
         },
         setCameraMode: function () {
-          /* ... (same as before, using this.) ... */
           if (!this.ship || !this.ship.material) return;
           if (this.isPovMode) {
             this.ship.material.transparent = true;
@@ -642,7 +713,6 @@
           }
         },
         createShip: function () {
-          /* ... (same as before, using this.) ... */
           const geometry = new THREE.ConeGeometry(0.5, 1.5, 4);
           const material = new THREE.MeshPhongMaterial({
             color: 0x00ff00,
@@ -669,7 +739,6 @@
           this.ship.add(targetingReticle);
         },
         createAsteroids: function () {
-          /* ... (same as before, using this.) ... */
           this.asteroids.forEach((a) => {
             if (a && a.parent) this.scene.remove(a);
           });
@@ -683,7 +752,6 @@
           for (let i = 0; i < numAsteroids; i++) this.createAsteroid();
         },
         createAsteroid: function (position, scale) {
-          /* ... (same as before, using this.) ... */
           const detail = 1;
           const geometry = new THREE.IcosahedronGeometry(1, detail);
           const positionAttribute = geometry.attributes.position;
@@ -743,7 +811,6 @@
           return asteroid;
         },
         createBullet: function () {
-          /* ... (same as before, using this.) ... */
           if (!this.ship) return;
           const geometry = new THREE.SphereGeometry(0.15, 8, 8);
           const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -760,7 +827,6 @@
           this.scene.add(bullet);
         },
         updateShip: function (deltaTime) {
-          /* ... (same as before, using this.) ... */
           if (this.isGameOver || !this.ship || !this.ship.parent) return;
           if (this.keys["ArrowLeft"]) {
             this.ship.rotation.z += this.SHIP_ROTATION_SPEED;
@@ -796,7 +862,6 @@
           }
         },
         updateAsteroids: function (deltaTime) {
-          /* ... (same as before, using this.) ... */
           this.asteroids.forEach((asteroid) => {
             if (!asteroid || !asteroid.parent) return;
             asteroid.position.add(asteroid.userData.velocity);
@@ -807,7 +872,6 @@
           });
         },
         updateBullets: function (deltaTime) {
-          /* ... (same as before, using this.) ... */
           for (let i = this.bullets.length - 1; i >= 0; i--) {
             const bullet = this.bullets[i];
             if (!bullet || !bullet.parent) {
@@ -826,7 +890,6 @@
           }
         },
         handleCameraKeyboardInput: function (deltaTime) {
-          /* ... (same as before, using this.) ... */
           if (
             this.isPovMode ||
             !this.controls ||
@@ -859,7 +922,6 @@
           }
         },
         wrapAroundScreen: function (object, boundaryRadius) {
-          /* ... (same as before, using this.) ... */
           if (!object || !object.parent) return;
           const buffer = object.userData.radius || 1;
           const limit = boundaryRadius + buffer;
@@ -871,7 +933,6 @@
           if (object.position.z < -limit) object.position.z = limit;
         },
         checkCollisions: function () {
-          /* ... (same as before, using this.) ... */
           if (this.isGameOver || !this.ship || !this.ship.parent) return;
           for (let i = this.bullets.length - 1; i >= 0; i--) {
             const bullet = this.bullets[i];
@@ -909,7 +970,6 @@
           }
         },
         splitAsteroid: function (asteroid, index) {
-          /* ... (same as before, using this.) ... */
           if (!asteroid || !asteroid.parent) return;
           const currentScale = asteroid.scale.x;
           const newScale = currentScale / 2;
@@ -964,7 +1024,6 @@
           }
         },
         handlePlayerHit: function (asteroid, index) {
-          /* ... (same as before, using this.) ... */
           this.lives--;
           this.updateUI();
           if (this.lives <= 0) {
@@ -990,14 +1049,12 @@
           }
         },
         resetShipPosition: function () {
-          /* ... (same as before, using this.) ... */
           if (!this.ship) return;
           this.ship.position.set(0, 0, 0);
           this.ship.rotation.set(Math.PI / 2, 0, 0);
           this.shipVelocity.set(0, 0, 0);
         },
         gameOver: function () {
-          /* ... (same as before, using this.) ... */
           this.isGameOver = true;
           this.showMessage(
             `Game Over! Score: ${this.score}\nLevel: ${this.currentLevel}\nPress Enter to Restart`
@@ -1005,7 +1062,6 @@
           if (this.ship && this.ship.parent) this.scene.remove(this.ship);
         },
         resetGame: function () {
-          /* ... (same as before, using this.) ... */
           console.log("AsteroidsGame: Resetting game...");
           this.score = 0;
           this.lives = this.INITIAL_LIVES;
@@ -1036,7 +1092,6 @@
           }
         },
         updateUI: function () {
-          /* ... (same as before, using this.) ... */
           if (this.scoreElement)
             this.scoreElement.textContent = `Score: ${this.score}`;
           if (this.livesElement)
@@ -1045,9 +1100,8 @@
             this.levelElement.textContent = `Level: ${this.currentLevel}`;
         },
         showMessage: function (text, duration = null) {
-          /* ... (same as before, using this.) ... */
           if (!this.messageBox) return;
-          this.messageBox.textContent = text;
+          this.messageBox.innerHTML = text.replace(/\n/g, "<br>"); // Replace newline chars
           this.messageBox.style.display = "block";
           if (this.messageBox.timeoutId)
             clearTimeout(this.messageBox.timeoutId);
@@ -1061,7 +1115,6 @@
           }
         },
         handleKeyDown: function (event) {
-          /* ... (same as before, using this.) ... */
           this.keys[event.code] = true;
           if (!this.isGameOver && event.code === "Space") {
             if (this.ship && this.ship.parent) this.createBullet();
@@ -1084,11 +1137,9 @@
           }
         },
         handleKeyUp: function (event) {
-          /* ... (same as before, using this.) ... */
           this.keys[event.code] = false;
         },
         onWindowResize: function () {
-          /* ... (same as before, using this.) ... */
           if (!this.camera || !this.renderer || !this.gameContainer) return;
           const width = this.gameContainer.clientWidth;
           const height = this.gameContainer.clientHeight;
@@ -1098,7 +1149,6 @@
           this.renderer.setSize(width, height);
         },
         animate: function () {
-          /* ... (same as before, using this.) ... */
           this.animationFrameId = requestAnimationFrame(this.boundAnimate);
           const deltaTime = this.clock.getDelta();
           if (this.isPovMode && this.ship) {
@@ -1137,7 +1187,7 @@
       };
 
       // ==================================================================
-      // Snake Game Object (Refactored)
+      // Snake Game Object (Refactored - Use unique UI IDs)
       // ==================================================================
       const SnakeGame = {
         // --- Constants ---
@@ -1150,8 +1200,8 @@
         ORBIT_ZOOM_STEP: 0.95,
         ORBIT_DOLLY_STEP: 1 / 0.95,
         // Visual Params (depend on SEGMENT_SIZE)
-        SNAKE_RADIUS: 0.45, // SEGMENT_SIZE * 0.45
-        EYE_RADIUS: 0.09, // SNAKE_RADIUS * 0.2
+        SNAKE_RADIUS: 0.45,
+        EYE_RADIUS: 0.09,
         EYE_COLOR: 0x000000,
         HEAD_COLOR: 0x33dd33,
         BODY_COLOR: 0x00aa00,
@@ -1227,13 +1277,18 @@
             return false;
           }
 
-          // Find UI elements within the wrapper
-          this.gameContainer = this.gameWrapper.querySelector("#gameContainer"); // Using original inner ID
+          // Find UI elements within the wrapper using unique IDs
+          this.gameContainer = this.gameWrapper.querySelector(
+            "#snake-gameContainer"
+          ); // Use specific ID
           this.canvasElement = this.gameWrapper.querySelector("#" + canvasId);
-          this.scoreElement = this.gameWrapper.querySelector("#score"); // Needs unique ID or class if shared
-          this.messageBox = this.gameWrapper.querySelector("#messageBox");
-          this.messageText = this.gameWrapper.querySelector("#messageText");
-          this.restartButton = this.gameWrapper.querySelector("#restartButton");
+          this.scoreElement = this.gameWrapper.querySelector("#snake-score");
+          this.messageBox = this.gameWrapper.querySelector("#snake-messageBox");
+          this.messageText =
+            this.gameWrapper.querySelector("#snake-messageText");
+          this.restartButton = this.gameWrapper.querySelector(
+            "#snake-restartButton"
+          );
           this.topViewBtn = this.gameWrapper.querySelector("#topViewBtn");
           this.frontViewBtn = this.gameWrapper.querySelector("#frontViewBtn");
           this.sideViewBtn = this.gameWrapper.querySelector("#sideViewBtn");
@@ -1339,7 +1394,6 @@
             return false;
           }
         },
-
         startGame: function () {
           if (!this.isInitialized) {
             console.error("SnakeGame: Not initialized.");
@@ -1388,7 +1442,6 @@
           this.canvasElement.focus(); // Focus canvas for keys
           console.log("SnakeGame: Game loops started.");
         },
-
         stopGame: function () {
           if (!this.gameRunning && !this.renderLoopId) return; // Already stopped
           console.log("SnakeGame: Stopping game...");
@@ -1403,7 +1456,6 @@
           this.removeListeners();
           console.log("SnakeGame: Game stopped.");
         },
-
         addListeners: function () {
           if (this.canvasElement) {
             this.canvasElement.addEventListener(
@@ -1424,7 +1476,6 @@
             this.resetViewBtn.addEventListener("click", this.boundResetView);
           console.log("SnakeGame: Listeners added.");
         },
-
         removeListeners: function () {
           if (this.canvasElement) {
             this.canvasElement.removeEventListener(
@@ -1454,7 +1505,7 @@
             this.resetViewBtn.removeEventListener("click", this.boundResetView);
           console.log("SnakeGame: Listeners removed.");
         },
-
+        // --- (Rest of SnakeGame methods: setupSceneExtras, gameLoop, clearSnakeMeshes, drawSnake, createFood, updateHighlighters, gameOver, updateScore, showMessage, hideMessage, setCameraView, setTopView, setFrontView, setSideView, resetView, handleKeyDown, onWindowResize, animate - kept mostly the same, ensuring 'this' is used correctly and UI elements referenced correctly) ---
         setupSceneExtras: function () {
           // Lighting
           const ambientLight = new THREE.AmbientLight(0xcccccc, 0.8);
@@ -1521,7 +1572,6 @@
           this.foodHighlighter.visible = false;
           this.scene.add(this.foodHighlighter);
         },
-
         gameLoop: function () {
           if (!this.gameRunning) return;
 
@@ -1582,9 +1632,7 @@
             this.currentSpeed
           );
         },
-
         clearSnakeMeshes: function () {
-          /* ... (same as original, using this.scene etc) ... */
           this.snakeMeshes.forEach((mesh) => {
             if (mesh === this.headSegment && mesh.children.length > 0) {
               [...mesh.children].forEach((child) => mesh.remove(child));
@@ -1595,7 +1643,6 @@
           this.headSegment = null;
         },
         drawSnake: function () {
-          /* ... (same as original, using this.scene etc) ... */
           this.clearSnakeMeshes();
           if (this.snakePositions.length === 0) return;
           const sphereGeometry = new THREE.SphereGeometry(
@@ -1651,7 +1698,6 @@
           }
         },
         createFood: function () {
-          /* ... (same as original, using this.scene etc) ... */
           const geometry = new THREE.SphereGeometry(
             this.SEGMENT_SIZE / 2,
             16,
@@ -1700,7 +1746,6 @@
           this.updateHighlighters();
         },
         updateHighlighters: function () {
-          /* ... (same as original, using this.scene etc) ... */
           if (this.snakePositions.length > 0) {
             const headPos = this.snakePositions[0];
             this.snakeHeadHighlighter.position.set(
@@ -1725,21 +1770,19 @@
           }
         },
         gameOver: function (reason) {
-          /* ... (same as original, using this.) ... */
           this.gameRunning = false;
           clearTimeout(this.gameLoopTimeoutId);
-          this.snakeHeadHighlighter.visible = false;
+          if (this.snakeHeadHighlighter)
+            this.snakeHeadHighlighter.visible = false;
           this.showMessage(
             `Game Over! ${reason}<br>Final Score: ${this.score}`
           );
         },
         updateScore: function () {
-          /* ... (same as original, using this.) ... */
           if (this.scoreElement)
             this.scoreElement.textContent = `Score: ${this.score}`;
         },
         showMessage: function (message, showButton = true) {
-          /* ... (same as original, using this.) ... */
           if (!this.messageBox || !this.messageText || !this.restartButton)
             return;
           this.messageText.innerHTML = message;
@@ -1747,15 +1790,14 @@
             ? "inline-block"
             : "none";
           this.messageBox.style.display = "block";
+          if (this.controls) this.controls.enabled = false; // Disable controls when message shows
         },
         hideMessage: function () {
-          /* ... (same as original, using this.) ... */
           if (!this.messageBox) return;
           this.messageBox.style.display = "none";
-          if (!this.gameRunning && this.controls) this.controls.enabled = true;
+          if (!this.gameRunning && this.controls) this.controls.enabled = true; // Re-enable controls
         },
         setCameraView: function (x, y, z, upX = 0, upY = 1, upZ = 0) {
-          /* ... (same as original, using this.) ... */
           if (!this.camera || !this.controls) return;
           this.camera.position.set(x, y, z);
           this.camera.up.set(upX, upY, upZ);
@@ -1781,9 +1823,7 @@
             0
           );
         },
-
         handleKeyDown: function (event) {
-          /* ... (mostly same as original, using this.) ... */
           const movementKeys = [
             "ArrowUp",
             "ArrowDown",
@@ -1906,7 +1946,6 @@
           }
         },
         onWindowResize: function () {
-          /* ... (same as original, using this.) ... */
           if (!this.camera || !this.renderer || !this.gameContainer) return;
           const width = this.gameContainer.clientWidth;
           const height = this.gameContainer.clientHeight;
@@ -1915,7 +1954,6 @@
           this.camera.updateProjectionMatrix();
           this.renderer.setSize(width, height);
         },
-
         animate: function () {
           // Render loop
           this.renderLoopId = requestAnimationFrame(this.boundAnimate);
@@ -1933,7 +1971,1029 @@
       };
 
       // ==================================================================
-      // Menu and Game Management Logic
+      // Space Invaders Game Object (Floor Grid Fixes)
+      // ==================================================================
+      const SpaceInvadersGame = {
+        // --- Config Constants ---
+        PLAYER_SPEED: 0.15,
+        PLAYER_SPEED_Z: 0.12,
+        PLAYER_Y_POS: -12,
+        PLAYER_WIDTH: 1.5,
+        PLAYER_DEPTH: 1,
+        PLAYER_MIN_Z: -8,
+        PLAYER_MAX_Z: 8,
+        BULLET_SPEED: 6, // *** Reverted player bullet speed ***
+        BULLET_RADIUS: 0.15,
+        MAX_PLAYER_BULLETS: 1,
+        // --- Invader Grid Config (Level 1) ---
+        INVADER_ROWS: 5, // Height: 5 rows high (Y)
+        INVADER_COLS: 10, // Width: 10 columns wide (X)
+        INVADER_DEPTH_LAYERS: 10, // Depth: 10 layers deep (Z)
+        INVADER_SPACING_X: 2.0,
+        INVADER_SPACING_Y: 1.8, // Vertical spacing between rows
+        INVADER_SPACING_Z: 1.5,
+        INVADER_START_Y_BASE: 4,
+        INVADER_START_Z: -5, // Start Z position of the front invader layer
+        // --- Invader Visuals ---
+        INVADER_WIDTH: 1.0,
+        INVADER_HEIGHT: 0.8,
+        INVADER_DEPTH: 0.8,
+        // --- Movement & Speed ---
+        INVADER_MOVE_INTERVAL_START: 1000,
+        INVADER_MOVE_INTERVAL_MIN: 100,
+        INVADER_SPEEDUP_FACTOR: 0.95,
+        INVADER_DROP_DISTANCE: 0.5,
+        INVADER_HORIZONTAL_STEP: 0.4,
+        // --- Shooting ---
+        INVADER_SHOOT_CHANCE: 0.001,
+        INVADER_BULLET_SPEED: 3, // *** Reverted invader bullet speed ***
+        // --- Barrier Config ---
+        BARRIER_GRID_ROWS: 4,
+        BARRIER_GRID_COLS: 4,
+        BARRIER_GRID_SPACING_X: 7.0,
+        BARRIER_GRID_SPACING_Z: 4.0,
+        BARRIER_START_Z: -2,
+        BARRIER_Y_POS: -8,
+        BARRIER_WIDTH: 4,
+        BARRIER_HEIGHT: 2,
+        BARRIER_BLOCK_SIZE: 0.5,
+        BARRIER_STRUCTURE_DEPTH_BLOCKS: 2, // Control barrier thickness (in blocks)
+        // --- Game Rules ---
+        INITIAL_LIVES: 3,
+        POINTS_PER_INVADER: 10,
+        GAME_AREA_WIDTH: 40,
+        GAME_AREA_DEPTH: 30, // Approx play area size
+
+        // --- State & Objects ---
+        scene: null,
+        camera: null,
+        renderer: null,
+        controls: null,
+        player: null,
+        clock: null,
+        keys: {},
+        playerBullets: [],
+        invaderBullets: [],
+        invaders: [],
+        barriers: [],
+        invaderGroup: null,
+        floorGrid: null,
+        invaderDirection: 1,
+        invaderMoveTimer: 0,
+        invaderMoveInterval: 0,
+        invadersNeedToDrop: false,
+        score: 0,
+        lives: 0,
+        currentLevel: 1,
+        isGameOver: false,
+        gameRunning: false,
+        animationFrameId: null,
+        isInitialized: false,
+
+        // --- UI Elements ---
+        messageBox: null,
+        scoreElement: null,
+        livesElement: null,
+        levelElement: null,
+        gameContainer: null,
+        canvasElement: null,
+        gameWrapper: null,
+
+        // --- Bound Functions ---
+        boundHandleKeyDown: null,
+        boundHandleKeyUp: null,
+        boundOnWindowResize: null,
+        boundAnimate: null,
+
+        init: function (wrapperId, canvasId) {
+          if (this.isInitialized) return true;
+          console.log("SpaceInvadersGame: Initializing...");
+          this.gameWrapper = document.getElementById(wrapperId);
+          if (!this.gameWrapper) {
+            console.error(
+              `SpaceInvadersGame: Wrapper element #${wrapperId} not found!`
+            );
+            return false;
+          }
+
+          this.canvasElement = this.gameWrapper.querySelector("#" + canvasId);
+          this.messageBox = this.gameWrapper.querySelector(
+            "#invaders-message-box"
+          );
+          this.scoreElement = this.gameWrapper.querySelector("#invaders-score");
+          this.livesElement = this.gameWrapper.querySelector("#invaders-lives");
+          this.levelElement = this.gameWrapper.querySelector("#invaders-level");
+          this.gameContainer =
+            this.gameWrapper.querySelector(".game-container");
+
+          if (
+            !this.canvasElement ||
+            !this.messageBox ||
+            !this.scoreElement ||
+            !this.livesElement ||
+            !this.levelElement ||
+            !this.gameContainer
+          ) {
+            console.error(
+              "SpaceInvadersGame: Failed to find all required UI elements."
+            );
+            return false;
+          }
+
+          this.boundHandleKeyDown = this.handleKeyDown.bind(this);
+          this.boundHandleKeyUp = this.handleKeyUp.bind(this);
+          this.boundOnWindowResize = this.onWindowResize.bind(this);
+          this.boundAnimate = this.animate.bind(this);
+
+          try {
+            if (typeof THREE === "undefined")
+              throw new Error("THREE object not defined.");
+            this.scene = new THREE.Scene();
+            this.scene.background = new THREE.Color(0x000000);
+            this.clock = new THREE.Clock();
+            this.keys = {};
+            this.playerBullets = [];
+            this.invaderBullets = [];
+            this.invaders = [];
+            this.barriers = [];
+
+            const aspect =
+              this.gameContainer.clientWidth / this.gameContainer.clientHeight;
+            this.camera = new THREE.PerspectiveCamera(60, aspect, 0.1, 1000);
+            this.camera.position.set(0, 10, 45);
+            this.camera.lookAt(0, 5, 0);
+
+            this.renderer = new THREE.WebGLRenderer({
+              canvas: this.canvasElement,
+              antialias: true,
+            });
+            this.renderer.setSize(
+              this.gameContainer.clientWidth,
+              this.gameContainer.clientHeight
+            );
+            this.renderer.setPixelRatio(window.devicePixelRatio);
+            this.renderer.shadowMap.enabled = true;
+            this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+            if (typeof THREE.OrbitControls !== "undefined") {
+              this.controls = new THREE.OrbitControls(
+                this.camera,
+                this.canvasElement
+              );
+              this.controls.enableDamping = true;
+              this.controls.dampingFactor = 0.1;
+              this.controls.screenSpacePanning = false;
+              this.controls.target.set(0, 5, 0);
+              this.controls.maxPolarAngle = Math.PI / 1.8;
+              this.controls.minDistance = 15;
+              this.controls.maxDistance = 80;
+              this.controls.enabled = true;
+              this.controls.update();
+            } else {
+              console.warn("SpaceInvadersGame: OrbitControls not loaded.");
+              this.controls = null;
+            }
+
+            this.setupSceneExtras(); // Setup lights (grid moved to resetGame)
+            this.createPlayer();
+
+            this.isInitialized = true;
+            console.log("SpaceInvadersGame: Initialization complete.");
+            return true;
+          } catch (error) {
+            console.error(
+              "SpaceInvadersGame: Error during initialization:",
+              error
+            );
+            this.showMessage(`Initialization Error: ${error.message}`);
+            return false;
+          }
+        },
+
+        startGame: function () {
+          if (!this.isInitialized) {
+            console.error("SpaceInvadersGame: Not initialized.");
+            return;
+          }
+          if (this.gameRunning) return;
+          console.log("SpaceInvadersGame: Starting game...");
+          this.gameRunning = true;
+          this.addListeners();
+          this.resetGame(); // This now creates the grid
+          if (this.animationFrameId)
+            cancelAnimationFrame(this.animationFrameId);
+          this.animate();
+          this.canvasElement.focus();
+          console.log("SpaceInvadersGame: Game loop started.");
+        },
+
+        stopGame: function () {
+          if (!this.gameRunning && !this.animationFrameId) return;
+          console.log("SpaceInvadersGame: Stopping game...");
+          this.gameRunning = false;
+          if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+            this.animationFrameId = null;
+          }
+          this.removeListeners();
+          console.log("SpaceInvadersGame: Game stopped.");
+        },
+
+        addListeners: function () {
+          if (this.canvasElement) {
+            this.canvasElement.addEventListener(
+              "keydown",
+              this.boundHandleKeyDown
+            );
+            this.canvasElement.addEventListener("keyup", this.boundHandleKeyUp);
+          }
+          window.addEventListener("resize", this.boundOnWindowResize);
+          console.log("SpaceInvadersGame: Listeners added.");
+        },
+
+        removeListeners: function () {
+          if (this.canvasElement) {
+            this.canvasElement.removeEventListener(
+              "keydown",
+              this.boundHandleKeyDown
+            );
+            this.canvasElement.removeEventListener(
+              "keyup",
+              this.boundHandleKeyUp
+            );
+          }
+          window.removeEventListener("resize", this.boundOnWindowResize);
+          console.log("SpaceInvadersGame: Listeners removed.");
+        },
+
+        setupSceneExtras: function () {
+          // Only setup lights here now, grid is handled in resetGame
+          const ambientLight = new THREE.AmbientLight(0x606060);
+          this.scene.add(ambientLight);
+
+          const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+          directionalLight.position.set(10, 30, 20);
+          directionalLight.castShadow = true;
+
+          directionalLight.shadow.mapSize.width = 1024;
+          directionalLight.shadow.mapSize.height = 1024;
+          const shadowCamSize = 30;
+          directionalLight.shadow.camera.left = -shadowCamSize;
+          directionalLight.shadow.camera.right = shadowCamSize;
+          directionalLight.shadow.camera.top = shadowCamSize;
+          directionalLight.shadow.camera.bottom = -shadowCamSize;
+          directionalLight.shadow.camera.near = 1;
+          directionalLight.shadow.camera.far = 60;
+
+          this.scene.add(directionalLight);
+        },
+
+        createPlayer: function () {
+          const geometry = new THREE.BoxGeometry(
+            this.PLAYER_WIDTH,
+            0.5,
+            this.PLAYER_DEPTH
+          );
+          const material = new THREE.MeshPhongMaterial({ color: 0x00ff00 });
+          this.player = new THREE.Mesh(geometry, material);
+          this.player.position.set(0, this.PLAYER_Y_POS, 0);
+          this.player.userData.radius = this.PLAYER_WIDTH / 2;
+          this.player.castShadow = true;
+        },
+
+        createInvaders: function () {
+          if (this.invaderGroup) {
+            while (this.invaderGroup.children.length > 0) {
+              this.invaderGroup.remove(this.invaderGroup.children[0]);
+            }
+            this.scene.remove(this.invaderGroup);
+          }
+          this.invaders = [];
+          this.invaderGroup = new THREE.Group();
+          this.scene.add(this.invaderGroup);
+
+          const currentRows = this.INVADER_ROWS;
+          const currentCol = this.INVADER_COLS;
+          const currentDepth = this.INVADER_DEPTH_LAYERS;
+
+          const invaderGeometry = new THREE.BoxGeometry(
+            this.INVADER_WIDTH,
+            this.INVADER_HEIGHT,
+            this.INVADER_DEPTH
+          );
+          const invaderColors = [
+            0xffffff, 0xffff00, 0x00ffff, 0xff00ff, 0xffa500,
+          ];
+
+          const gridWidth = (currentCol - 1) * this.INVADER_SPACING_X;
+          const gridHeight = (currentRows - 1) * this.INVADER_SPACING_Y;
+          const gridDepth = (currentDepth - 1) * this.INVADER_SPACING_Z;
+
+          const startX = -gridWidth / 2;
+          const startY = this.INVADER_START_Y_BASE;
+          const startZ = this.INVADER_START_Z - gridDepth / 2;
+
+          for (let layer = 0; layer < currentDepth; layer++) {
+            for (let row = 0; row < currentRows; row++) {
+              for (let col = 0; col < currentCol; col++) {
+                const material = new THREE.MeshPhongMaterial({
+                  color: invaderColors[row % invaderColors.length],
+                });
+                const invader = new THREE.Mesh(invaderGeometry, material);
+                invader.castShadow = true;
+
+                invader.position.set(
+                  startX + col * this.INVADER_SPACING_X,
+                  startY + row * this.INVADER_SPACING_Y,
+                  startZ + layer * this.INVADER_SPACING_Z
+                );
+                invader.userData = {
+                  type: "invader",
+                  row: row,
+                  col: col,
+                  layer: layer,
+                  radius:
+                    Math.max(
+                      this.INVADER_WIDTH,
+                      this.INVADER_HEIGHT,
+                      this.INVADER_DEPTH
+                    ) / 2,
+                  points: (currentRows - row) * this.POINTS_PER_INVADER,
+                };
+
+                this.invaderGroup.add(invader);
+                this.invaders.push(invader);
+              }
+            }
+          }
+          this.invaderGroup.position.set(0, 0, 0);
+          console.log(
+            `SpaceInvadersGame: Created ${this.invaders.length} invaders in a ${currentCol}x${currentRows}x${currentDepth} grid.`
+          );
+        },
+
+        createBarriers: function () {
+          this.barriers.forEach((barrierGroup) => {
+            while (barrierGroup.children.length > 0) {
+              barrierGroup.remove(barrierGroup.children[0]);
+            }
+            this.scene.remove(barrierGroup);
+          });
+          this.barriers = [];
+
+          const blockGeometry = new THREE.BoxGeometry(
+            this.BARRIER_BLOCK_SIZE,
+            this.BARRIER_BLOCK_SIZE,
+            this.BARRIER_BLOCK_SIZE
+          );
+          const blockMaterial = new THREE.MeshPhongMaterial({
+            color: 0x00cc00,
+          });
+
+          const gridCols = this.BARRIER_GRID_COLS;
+          const gridRows = this.BARRIER_GRID_ROWS;
+          const gridSpacingX = this.BARRIER_GRID_SPACING_X;
+          const gridSpacingZ = this.BARRIER_GRID_SPACING_Z;
+
+          const gridWidth = (gridCols - 1) * gridSpacingX;
+          const gridDepth = (gridRows - 1) * gridSpacingZ;
+          const gridStartX = -gridWidth / 2;
+          const gridStartZ = this.BARRIER_START_Z - gridDepth / 2;
+
+          for (let gridRow = 0; gridRow < gridRows; gridRow++) {
+            for (let gridCol = 0; gridCol < gridCols; gridCol++) {
+              const barrierGroup = new THREE.Group();
+              const barrierCenterX = gridStartX + gridCol * gridSpacingX;
+              const barrierCenterZ = gridStartZ + gridRow * gridSpacingZ;
+
+              barrierGroup.position.set(
+                barrierCenterX,
+                this.BARRIER_Y_POS,
+                barrierCenterZ
+              );
+              this.scene.add(barrierGroup);
+              this.barriers.push(barrierGroup);
+
+              const blocksWide = Math.floor(
+                this.BARRIER_WIDTH / this.BARRIER_BLOCK_SIZE
+              );
+              const blocksHigh = Math.floor(
+                this.BARRIER_HEIGHT / this.BARRIER_BLOCK_SIZE
+              );
+              const blocksDeep = this.BARRIER_STRUCTURE_DEPTH_BLOCKS;
+
+              const structureStartX =
+                -this.BARRIER_WIDTH / 2 + this.BARRIER_BLOCK_SIZE / 2;
+              const structureStartY = this.BARRIER_BLOCK_SIZE / 2;
+              const structureStartZ =
+                -(blocksDeep * this.BARRIER_BLOCK_SIZE) / 2 +
+                this.BARRIER_BLOCK_SIZE / 2;
+
+              for (let r = 0; r < blocksHigh; r++) {
+                for (let c = 0; c < blocksWide; c++) {
+                  if (
+                    (r === 0 && (c < 1 || c > blocksWide - 2)) ||
+                    (r > blocksHigh - 2 && c > 0 && c < blocksWide - 1)
+                  ) {
+                    continue;
+                  }
+                  for (let d = 0; d < blocksDeep; d++) {
+                    const block = new THREE.Mesh(blockGeometry, blockMaterial);
+                    block.castShadow = true;
+                    block.receiveShadow = true;
+                    const zOffset =
+                      structureStartZ + d * this.BARRIER_BLOCK_SIZE;
+                    block.position.set(
+                      structureStartX + c * this.BARRIER_BLOCK_SIZE,
+                      structureStartY + r * this.BARRIER_BLOCK_SIZE,
+                      zOffset
+                    );
+                    block.userData = {
+                      type: "barrier_block",
+                      radius: this.BARRIER_BLOCK_SIZE * 0.7,
+                    };
+                    barrierGroup.add(block);
+                  }
+                }
+              }
+            }
+          }
+          console.log(
+            `SpaceInvadersGame: Created ${this.barriers.length} barriers in a ${gridCols}x${gridRows} grid.`
+          );
+        },
+
+        createPlayerBullet: function () {
+          if (
+            !this.player ||
+            !this.player.parent ||
+            this.playerBullets.length >= this.MAX_PLAYER_BULLETS
+          )
+            return;
+          const geometry = new THREE.SphereGeometry(this.BULLET_RADIUS, 8, 8);
+          const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
+          const bullet = new THREE.Mesh(geometry, material);
+          bullet.position.copy(this.player.position);
+          bullet.position.y += 0.5;
+          bullet.userData = {
+            type: "player_bullet",
+            velocity: new THREE.Vector3(0, this.BULLET_SPEED, 0),
+            radius: this.BULLET_RADIUS,
+          };
+          this.playerBullets.push(bullet);
+          this.scene.add(bullet);
+        },
+
+        createInvaderBullet: function (invader) {
+          if (!invader || !invader.parent) return;
+          const geometry = new THREE.SphereGeometry(
+            this.BULLET_RADIUS * 1.2,
+            6,
+            6
+          );
+          const material = new THREE.MeshBasicMaterial({ color: 0xffa500 });
+          const bullet = new THREE.Mesh(geometry, material);
+          const invaderWorldPos = new THREE.Vector3();
+          invader.getWorldPosition(invaderWorldPos);
+          bullet.position.copy(invaderWorldPos);
+          bullet.position.y -= this.INVADER_HEIGHT / 2;
+          bullet.userData = {
+            type: "invader_bullet",
+            velocity: new THREE.Vector3(0, -this.INVADER_BULLET_SPEED, 0),
+            radius: this.BULLET_RADIUS,
+          };
+          this.invaderBullets.push(bullet);
+          this.scene.add(bullet);
+        },
+
+        updatePlayer: function (deltaTime) {
+          if (!this.player || !this.player.parent || this.isGameOver) return;
+          let moveX = 0;
+          let moveZ = 0;
+          if (this.keys["ArrowLeft"] || this.keys["KeyA"]) {
+            moveX -= 1;
+          }
+          if (this.keys["ArrowRight"] || this.keys["KeyD"]) {
+            moveX += 1;
+          }
+          if (this.keys["ArrowUp"] || this.keys["KeyW"]) {
+            moveZ -= 1;
+          }
+          if (this.keys["ArrowDown"] || this.keys["KeyS"]) {
+            moveZ += 1;
+          }
+          this.player.position.x += moveX * this.PLAYER_SPEED;
+          this.player.position.z += moveZ * this.PLAYER_SPEED_Z;
+          const halfWidth = this.GAME_AREA_WIDTH / 2 - this.PLAYER_WIDTH / 2;
+          this.player.position.x = Math.max(
+            -halfWidth,
+            Math.min(halfWidth, this.player.position.x)
+          );
+          this.player.position.z = Math.max(
+            this.PLAYER_MIN_Z,
+            Math.min(this.PLAYER_MAX_Z, this.player.position.z)
+          );
+        },
+
+        updateInvaders: function (deltaTime) {
+          if (
+            !this.invaderGroup ||
+            this.invaders.length === 0 ||
+            this.isGameOver
+          )
+            return;
+          this.invaderMoveTimer += deltaTime * 1000;
+          if (this.invaderMoveTimer >= this.invaderMoveInterval) {
+            this.invaderMoveTimer = 0;
+            let hitEdge = false;
+            const invaderBox = new THREE.Box3().setFromObject(
+              this.invaderGroup
+            );
+            const minX = invaderBox.min.x;
+            const maxX = invaderBox.max.x;
+            const halfWidth = this.GAME_AREA_WIDTH / 2;
+            if (
+              (this.invaderDirection > 0 &&
+                maxX + this.INVADER_HORIZONTAL_STEP > halfWidth) ||
+              (this.invaderDirection < 0 &&
+                minX - this.INVADER_HORIZONTAL_STEP < -halfWidth)
+            ) {
+              hitEdge = true;
+            }
+            if (this.invadersNeedToDrop) {
+              this.invaderGroup.position.y -= this.INVADER_DROP_DISTANCE;
+              this.invadersNeedToDrop = false;
+              const updatedInvaderBox = new THREE.Box3().setFromObject(
+                this.invaderGroup
+              );
+              if (updatedInvaderBox.min.y <= this.PLAYER_Y_POS + 1) {
+                this.gameOver("Invaders reached the bottom!");
+                return;
+              }
+            } else if (hitEdge) {
+              this.invaderDirection *= -1;
+              this.invadersNeedToDrop = true;
+              this.invaderGroup.position.x +=
+                this.invaderDirection * this.INVADER_HORIZONTAL_STEP * 0.5;
+            } else {
+              this.invaderGroup.position.x +=
+                this.invaderDirection * this.INVADER_HORIZONTAL_STEP;
+            }
+          }
+          const bottomInvaders = {};
+          this.invaders.forEach((invader) => {
+            if (!invader.parent) return;
+            const invaderWorldPos = new THREE.Vector3();
+            invader.getWorldPosition(invaderWorldPos);
+            const key = `${Math.round(invaderWorldPos.x * 10)}_${Math.round(
+              invaderWorldPos.z * 10
+            )}`;
+            if (
+              !bottomInvaders[key] ||
+              invaderWorldPos.y < bottomInvaders[key].position.y
+            ) {
+              bottomInvaders[key] = {
+                invader: invader,
+                position: invaderWorldPos,
+              };
+            }
+          });
+          Object.values(bottomInvaders).forEach((data) => {
+            if (Math.random() < this.INVADER_SHOOT_CHANCE) {
+              this.createInvaderBullet(data.invader);
+            }
+          });
+        },
+
+        updateBullets: function (deltaTime) {
+          // Calculate the top Y position of the invader block dynamically
+          let topInvaderY = -Infinity;
+          if (this.invaderGroup && this.invaders.length > 0) {
+            const invaderBox = new THREE.Box3().setFromObject(
+              this.invaderGroup
+            );
+            // Check if the box is valid (not empty) before accessing max.y
+            if (!invaderBox.isEmpty()) {
+              topInvaderY = invaderBox.max.y;
+            } else {
+              // Fallback if box is empty
+              topInvaderY =
+                this.INVADER_START_Y_BASE +
+                (this.INVADER_ROWS - 1) * this.INVADER_SPACING_Y +
+                this.INVADER_HEIGHT;
+            }
+          } else {
+            // Default fallback if no invaders group or array is empty
+            topInvaderY =
+              this.INVADER_START_Y_BASE +
+              (this.INVADER_ROWS - 1) * this.INVADER_SPACING_Y +
+              this.INVADER_HEIGHT;
+          }
+          const playerBulletRemoveThreshold = topInvaderY + 2.0; // Remove slightly above the highest invader
+
+          // Player Bullets
+          for (let i = this.playerBullets.length - 1; i >= 0; i--) {
+            const bullet = this.playerBullets[i];
+            if (!bullet || !bullet.parent) {
+              this.playerBullets.splice(i, 1);
+              continue;
+            }
+            bullet.position.addScaledVector(
+              bullet.userData.velocity,
+              deltaTime
+            );
+            // Remove if past the calculated threshold
+            if (bullet.position.y > playerBulletRemoveThreshold) {
+              this.scene.remove(bullet);
+              this.playerBullets.splice(i, 1);
+            }
+          }
+
+          // Invader Bullets
+          for (let i = this.invaderBullets.length - 1; i >= 0; i--) {
+            const bullet = this.invaderBullets[i];
+            if (!bullet || !bullet.parent) {
+              this.invaderBullets.splice(i, 1);
+              continue;
+            }
+            bullet.position.addScaledVector(
+              bullet.userData.velocity,
+              deltaTime
+            );
+            // *** Remove invader bullets when they hit the player's Y level ***
+            if (bullet.position.y <= this.PLAYER_Y_POS) {
+              // TODO: Add explosion effect here later?
+              this.scene.remove(bullet);
+              this.invaderBullets.splice(i, 1);
+            }
+          }
+        },
+
+        checkCollisions: function () {
+          if (this.isGameOver) return;
+          const invaderWorldPos = new THREE.Vector3();
+
+          // 1. Player Bullets vs Invaders
+          for (let i = this.playerBullets.length - 1; i >= 0; i--) {
+            const bullet = this.playerBullets[i];
+            if (!bullet || !bullet.parent) continue;
+            for (let j = this.invaders.length - 1; j >= 0; j--) {
+              const invader = this.invaders[j];
+              if (!invader || !invader.parent) continue;
+              invader.getWorldPosition(invaderWorldPos);
+              if (
+                bullet.position.distanceTo(invaderWorldPos) <
+                bullet.userData.radius + invader.userData.radius
+              ) {
+                this.score += invader.userData.points;
+                this.updateUI();
+                this.scene.remove(bullet);
+                this.playerBullets.splice(i, 1);
+                this.invaderGroup.remove(invader);
+                this.invaders.splice(j, 1);
+                this.invaderMoveInterval = Math.max(
+                  this.INVADER_MOVE_INTERVAL_MIN,
+                  this.invaderMoveInterval * this.INVADER_SPEEDUP_FACTOR
+                );
+                if (this.invaders.length === 0) {
+                  this.nextLevel();
+                  return;
+                }
+                break;
+              }
+            }
+          }
+
+          // 2. Invader Bullets vs Player
+          if (this.player && this.player.parent) {
+            for (let i = this.invaderBullets.length - 1; i >= 0; i--) {
+              const bullet = this.invaderBullets[i];
+              if (!bullet || !bullet.parent) continue;
+              if (
+                bullet.position.distanceTo(this.player.position) <
+                bullet.userData.radius + this.player.userData.radius
+              ) {
+                this.scene.remove(bullet);
+                this.invaderBullets.splice(i, 1);
+                this.handlePlayerHit();
+                break;
+              }
+            }
+          }
+
+          // 3. Bullets vs Barriers
+          const barrierBlockWorldPos = new THREE.Vector3();
+          this.barriers.forEach((barrierGroup) => {
+            // Iterate through barrier groups
+            for (let k = barrierGroup.children.length - 1; k >= 0; k--) {
+              // Iterate through blocks in group
+              const block = barrierGroup.children[k];
+              if (
+                !block ||
+                !block.userData ||
+                block.userData.type !== "barrier_block"
+              )
+                continue;
+
+              // Get world position of the block (considers barrierGroup position)
+              block.getWorldPosition(barrierBlockWorldPos);
+
+              // Check player bullets
+              for (let i = this.playerBullets.length - 1; i >= 0; i--) {
+                const bullet = this.playerBullets[i];
+                if (!bullet || !bullet.parent) continue;
+                if (
+                  bullet.position.distanceTo(barrierBlockWorldPos) <
+                  bullet.userData.radius + block.userData.radius
+                ) {
+                  this.scene.remove(bullet);
+                  this.playerBullets.splice(i, 1);
+                  barrierGroup.remove(block); // Remove block from its group
+                  break;
+                }
+              }
+              // Check invader bullets (if block still exists)
+              if (block.parent === barrierGroup) {
+                for (let i = this.invaderBullets.length - 1; i >= 0; i--) {
+                  const bullet = this.invaderBullets[i];
+                  if (!bullet || !bullet.parent) continue;
+                  if (
+                    bullet.position.distanceTo(barrierBlockWorldPos) <
+                    bullet.userData.radius + block.userData.radius
+                  ) {
+                    this.scene.remove(bullet);
+                    this.invaderBullets.splice(i, 1);
+                    barrierGroup.remove(block); // Remove block from its group
+                    break;
+                  }
+                }
+              }
+            }
+          });
+        },
+
+        handlePlayerHit: function () {
+          this.lives--;
+          this.updateUI();
+          if (this.lives <= 0) {
+            this.gameOver("Player destroyed!");
+          } else {
+            this.showMessage(`Hit! ${this.lives} lives left.`, 1500);
+            if (this.player && this.player.parent)
+              this.scene.remove(this.player);
+            setTimeout(() => {
+              if (this.lives > 0 && !this.isGameOver) {
+                this.resetPlayerPosition();
+                if (this.player && !this.player.parent)
+                  this.scene.add(this.player);
+              }
+            }, 1600);
+          }
+        },
+
+        resetPlayerPosition: function () {
+          if (!this.player) return;
+          this.player.position.set(0, this.PLAYER_Y_POS, 0);
+          this.keys = {};
+        },
+
+        nextLevel: function () {
+          this.currentLevel++;
+          this.updateUI();
+          this.showMessage(
+            `Level ${this.currentLevel - 1} Cleared!\nStarting Level ${
+              this.currentLevel
+            }...`,
+            2500
+          );
+          setTimeout(() => {
+            if (!this.isGameOver) {
+              this.invaderMoveInterval =
+                this.INVADER_MOVE_INTERVAL_START *
+                Math.pow(0.9, this.currentLevel - 1);
+              this.invaderMoveInterval = Math.max(
+                this.INVADER_MOVE_INTERVAL_MIN,
+                this.invaderMoveInterval
+              );
+              this.invaderDirection = 1;
+              this.invadersNeedToDrop = false;
+              this.invaderMoveTimer = 0;
+              this.invaderGroup.position.set(0, 0, 0);
+              // TODO: Increase grid dimensions here for future levels
+              // Example: Reset to base dimensions for now
+              // this.INVADER_ROWS = 5;
+              // this.INVADER_COLS = 10;
+              // this.INVADER_DEPTH_LAYERS = 10;
+              this.createInvaders(); // Recreate grid
+              this.createBarriers();
+              this.resetPlayerPosition();
+              this.playerBullets.forEach((b) => {
+                if (b.parent) this.scene.remove(b);
+              });
+              this.playerBullets = [];
+              this.invaderBullets.forEach((b) => {
+                if (b.parent) this.scene.remove(b);
+              });
+              this.invaderBullets = [];
+            }
+          }, 2600);
+        },
+
+        gameOver: function (reason) {
+          if (this.isGameOver) return;
+          this.isGameOver = true;
+          this.gameRunning = false;
+          this.showMessage(
+            `Game Over! ${reason}\nScore: ${this.score} | Level: ${this.currentLevel}\nPress Enter to Restart`
+          );
+          if (this.player && this.player.parent) this.scene.remove(this.player);
+          if (this.controls) this.controls.enabled = false; // Disable controls on Game Over
+        },
+
+        resetGame: function () {
+          console.log("SpaceInvadersGame: Resetting game...");
+          this.score = 0;
+          this.lives = this.INITIAL_LIVES;
+          this.currentLevel = 1;
+          this.isGameOver = false;
+          this.gameRunning = true;
+          if (this.messageBox) this.messageBox.style.display = "none";
+
+          this.clearGameObjects();
+
+          // *** Create Floor Grid ***
+          const gridDivisions = 20;
+          const gridColorCenter = 0xffffff; // White center lines
+          const gridColorGrid = 0xcccccc; // Lighter grey grid lines
+          this.floorGrid = new THREE.GridHelper(
+            this.GAME_AREA_WIDTH * 1.5,
+            gridDivisions,
+            gridColorCenter,
+            gridColorGrid
+          );
+          this.floorGrid.position.y = this.PLAYER_Y_POS - 0.2; // Ensure it's below player
+          this.floorGrid.receiveShadow = true;
+          this.scene.add(this.floorGrid);
+          console.log("Floor grid created at Y:", this.floorGrid.position.y);
+
+          this.resetPlayerPosition();
+          if (this.player && !this.player.parent) this.scene.add(this.player);
+
+          this.invaderMoveInterval = this.INVADER_MOVE_INTERVAL_START;
+          this.invaderDirection = 1;
+          this.invadersNeedToDrop = false;
+          this.invaderMoveTimer = 0;
+          // Reset dimensions explicitly for level 1 start (if they change in nextLevel)
+          // this.INVADER_ROWS = 5;
+          // this.INVADER_COLS = 10;
+          // this.INVADER_DEPTH_LAYERS = 10;
+          this.createInvaders(); // Create the 10x5x10 grid
+
+          this.createBarriers(); // Create the barrier grid
+          this.updateUI();
+
+          if (this.controls) {
+            this.camera.position.set(0, 10, 45); // Adjusted position
+            this.controls.target.set(0, 5, 0); // Adjusted target
+            this.controls.enabled = true; // Enabled on reset
+            this.controls.update();
+          } else {
+            this.camera.position.set(0, 10, 45);
+            this.camera.lookAt(0, 5, 0);
+          }
+        },
+
+        clearGameObjects: function () {
+          this.playerBullets.forEach((b) => {
+            if (b.parent) this.scene.remove(b);
+          });
+          this.playerBullets = [];
+          this.invaderBullets.forEach((b) => {
+            if (b.parent) this.scene.remove(b);
+          });
+          this.invaderBullets = [];
+          if (this.invaderGroup) {
+            while (this.invaderGroup.children.length > 0) {
+              this.invaderGroup.remove(this.invaderGroup.children[0]);
+            }
+            this.scene.remove(this.invaderGroup);
+          }
+          this.invaders = [];
+          this.invaderGroup = null;
+          this.barriers.forEach((barrierGroup) => {
+            // Iterate through barrier groups in the array
+            while (barrierGroup.children.length > 0) {
+              barrierGroup.remove(barrierGroup.children[0]);
+            } // Remove blocks
+            this.scene.remove(barrierGroup); // Remove the group itself
+          });
+          this.barriers = []; // Clear the array
+          if (this.player && this.player.parent) this.scene.remove(this.player);
+          if (this.floorGrid && this.floorGrid.parent)
+            this.scene.remove(this.floorGrid); // Remove grid
+          this.floorGrid = null;
+        },
+
+        updateUI: function () {
+          if (this.scoreElement)
+            this.scoreElement.textContent = `Score: ${this.score}`;
+          if (this.livesElement)
+            this.livesElement.textContent = `Lives: ${this.lives}`;
+          if (this.levelElement)
+            this.levelElement.textContent = `Level: ${this.currentLevel}`;
+        },
+
+        showMessage: function (text, duration = null) {
+          if (!this.messageBox) return;
+          this.messageBox.innerHTML = text.replace(/\n/g, "<br>");
+          this.messageBox.style.display = "block";
+          if (this.messageBox.timeoutId)
+            clearTimeout(this.messageBox.timeoutId);
+          this.messageBox.timeoutId = null;
+          if (duration) {
+            this.messageBox.timeoutId = setTimeout(() => {
+              if (this.messageBox) this.messageBox.style.display = "none";
+              // Re-enable controls when temporary message hides, unless game is over
+              if (this.controls && !this.isGameOver)
+                this.controls.enabled = true;
+            }, duration);
+          }
+          // Disable controls when message is shown (except for game over restart)
+          if (this.controls && !this.isGameOver) this.controls.enabled = false;
+        },
+
+        handleKeyDown: function (event) {
+          this.keys[event.code] = true;
+          if (
+            [
+              "ArrowLeft",
+              "ArrowRight",
+              "ArrowUp",
+              "ArrowDown",
+              "Space",
+              "KeyA",
+              "KeyD",
+              "KeyW",
+              "KeyS",
+            ].includes(event.code)
+          ) {
+            event.preventDefault();
+          }
+          if (!this.isGameOver && event.code === "Space") {
+            this.createPlayerBullet();
+          }
+          if (this.isGameOver && event.code === "Enter") {
+            this.resetGame();
+            if (this.controls) this.controls.enabled = true; // Re-enable controls on restart
+          }
+        },
+
+        handleKeyUp: function (event) {
+          this.keys[event.code] = false;
+        },
+
+        onWindowResize: function () {
+          if (!this.camera || !this.renderer || !this.gameContainer) return;
+          const width = this.gameContainer.clientWidth;
+          const height = this.gameContainer.clientHeight;
+          if (width <= 0 || height <= 0) return;
+          this.camera.aspect = width / height;
+          this.camera.updateProjectionMatrix();
+          this.renderer.setSize(width, height);
+        },
+
+        animate: function () {
+          this.animationFrameId = requestAnimationFrame(this.boundAnimate);
+          const deltaTime = this.clock.getDelta();
+
+          // Update controls only if enabled
+          if (this.controls && this.controls.enabled) {
+            this.controls.update();
+          }
+
+          if (this.gameRunning && !this.isGameOver) {
+            this.updatePlayer(deltaTime);
+            this.updateInvaders(deltaTime);
+            this.updateBullets(deltaTime);
+            this.checkCollisions();
+          }
+
+          if (this.renderer && this.scene && this.camera) {
+            try {
+              this.renderer.render(this.scene, this.camera);
+            } catch (renderError) {
+              console.error(
+                "SpaceInvadersGame: Error during rendering:",
+                renderError
+              );
+              this.gameOver("Rendering error occurred.");
+            }
+          }
+        },
+      };
+
+      // ==================================================================
+      // Menu and Game Management Logic (Updated for Space Invaders)
       // ==================================================================
       document.addEventListener("DOMContentLoaded", () => {
         const menuScreen = document.getElementById("menu-screen");
@@ -1941,67 +3001,109 @@
           "asteroids-game-wrapper"
         );
         const snakeWrapper = document.getElementById("snake-game-wrapper");
+        const spaceInvadersWrapper = document.getElementById(
+          "space-invaders-game-wrapper"
+        ); // New Wrapper
+
         const startAsteroidsBtn = document.getElementById("start-asteroids");
         const startSnakeBtn = document.getElementById("start-snake");
+        const startInvadersBtn = document.getElementById(
+          "start-space-invaders"
+        ); // New Button
+
         const backToMenuBtns = document.querySelectorAll(".back-to-menu-btn");
 
         let activeGame = null; // Keep track of the currently active game object
+        let activeWrapper = null; // Keep track of the active game wrapper
 
         function showMenu() {
+          console.log("Showing menu...");
           menuScreen.classList.remove("hidden");
-          asteroidsWrapper.classList.add("hidden");
-          snakeWrapper.classList.add("hidden");
+          if (activeWrapper) {
+            activeWrapper.classList.add("hidden");
+          }
           if (activeGame && typeof activeGame.stopGame === "function") {
+            console.log("Stopping active game:", activeGame);
             activeGame.stopGame();
+          } else if (activeGame) {
+            console.warn(
+              "Active game object does not have a stopGame method:",
+              activeGame
+            );
           }
           activeGame = null;
+          activeWrapper = null;
           console.log("Returned to menu.");
         }
 
-        startAsteroidsBtn.addEventListener("click", () => {
-          console.log("Start Asteroids clicked");
-          if (activeGame && typeof activeGame.stopGame === "function")
-            activeGame.stopGame(); // Stop previous game
-          menuScreen.classList.add("hidden");
-          snakeWrapper.classList.add("hidden");
-          asteroidsWrapper.classList.remove("hidden");
+        function startGame(gameName, gameWrapper, gameObject, canvasId) {
+          console.log(`Attempting to start game: ${gameName}`);
+          if (activeGame && typeof activeGame.stopGame === "function") {
+            console.log("Stopping previous game:", activeGame);
+            activeGame.stopGame();
+          } else if (activeGame) {
+            console.warn(
+              "Previous game object did not have stopGame method:",
+              activeGame
+            );
+          }
+          if (activeWrapper) {
+            activeWrapper.classList.add("hidden");
+          }
 
-          if (!AsteroidsGame.isInitialized) {
-            if (
-              !AsteroidsGame.init("asteroids-game-wrapper", "asteroids-canvas")
-            ) {
+          menuScreen.classList.add("hidden");
+          gameWrapper.classList.remove("hidden");
+          activeWrapper = gameWrapper; // Set the new active wrapper
+
+          if (!gameObject.isInitialized) {
+            console.log(`Initializing ${gameName}...`);
+            if (!gameObject.init(gameWrapper.id, canvasId)) {
+              console.error(`Failed to initialize ${gameName}!`);
               showMenu(); // Go back to menu if init fails
-              alert("Failed to initialize Asteroids game!");
+              alert(
+                `Failed to initialize ${gameName} game! Check console for errors.`
+              );
               return;
             }
           }
-          AsteroidsGame.startGame();
-          activeGame = AsteroidsGame;
+          console.log(`Starting ${gameName}...`);
+          gameObject.startGame();
+          activeGame = gameObject; // Set the new active game
+        }
+
+        startAsteroidsBtn.addEventListener("click", () => {
+          startGame(
+            "Asteroids",
+            asteroidsWrapper,
+            AsteroidsGame,
+            "asteroids-canvas"
+          );
         });
 
         startSnakeBtn.addEventListener("click", () => {
-          console.log("Start Snake clicked");
-          if (activeGame && typeof activeGame.stopGame === "function")
-            activeGame.stopGame(); // Stop previous game
-          menuScreen.classList.add("hidden");
-          asteroidsWrapper.classList.add("hidden");
-          snakeWrapper.classList.remove("hidden");
+          startGame("Snake", snakeWrapper, SnakeGame, "snake-canvas");
+        });
 
-          if (!SnakeGame.isInitialized) {
-            if (!SnakeGame.init("snake-game-wrapper", "snake-canvas")) {
-              showMenu(); // Go back to menu if init fails
-              alert("Failed to initialize Snake game!");
-              return;
-            }
-          }
-          SnakeGame.startGame();
-          activeGame = SnakeGame;
+        startInvadersBtn.addEventListener("click", () => {
+          startGame(
+            "Space Invaders",
+            spaceInvadersWrapper,
+            SpaceInvadersGame,
+            "space-invaders-canvas"
+          );
         });
 
         // Add listeners for "Back to Menu" buttons
         backToMenuBtns.forEach((btn) => {
-          btn.addEventListener("click", showMenu);
+          btn.addEventListener("click", (event) => {
+            const gameName = event.target.dataset.game;
+            console.log(`Back to menu clicked from ${gameName}`);
+            showMenu();
+          });
         });
+
+        // Initial setup - show menu
+        showMenu();
       });
     </script>
   </body>
